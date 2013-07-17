@@ -62,7 +62,7 @@ declare function local:source-word-count() as xs:integer{
 };
 
 declare function local:get-wordcount-for-document-length($doc-length as xs:integer) as xs:integer{
-  xs:integer($doc-length div  local:source-doc-length() * local:source-word-count())
+  xs:integer((local:source-word-count() * $doc-length) div  local:source-doc-length() )
 };
 
 declare function local:get-random-text-with-length($doc-length as xs:integer){
