@@ -7,7 +7,6 @@ declare variable $db-name as xs:string external;
 
 xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,
 element default-values{
-	element run-label{$constants:RUN-LABEL},
     element batch-size{$constants:DEFAULT-BATCH-SIZE},	
     element forest-count{$constants:DEFAULT-FOREST-COUNT},	
 	element io-limit{$constants:DEFAULT-BACKGROUND-IO-LIMIT},

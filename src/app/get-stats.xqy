@@ -55,9 +55,9 @@ element io-stats{
   for $element in $run-data/*
   return
   $element,
-  element expected-fragments{$constants:inserts-per-second * $constants:duration},
+  element expected-fragments{util:toBytes(util:expected-document-count())},
   element expected-duration{$constants:duration},
-  element expected-footprint{xs:int($constants:inserts-per-second * $constants:duration * $constants:payload div 1024 div 1024)}  
+  element expected-footprint{util:toBytes(util:expected-document-volume())}  
 }
 
 

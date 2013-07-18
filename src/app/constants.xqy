@@ -1,17 +1,17 @@
 module namespace constants = "http://marklogic.com/io-test/constants";
 
 (: You might want to change this on a per run basis :)
-declare variable $RUN-LABEL := "fast-insert";
+declare variable $RUN-LABEL := "test-1";
 
 declare variable $run-time-data-fields := "forest-counts,batch-sizes,io-limits,merge-ratios,tree-sizes,fast-insert-values";
 
 (: Paramaters iterated through during the simulation :)
 declare variable $batch-sizes := "1";
-declare variable $forest-counts := "1,2";
+declare variable $forest-counts := "1";
 declare variable $io-limits := "0"; 
 declare variable $merge-ratios := "2";
 declare variable $tree-sizes := "16";
-declare variable $fast-insert-values := "TRUE,FALSE";
+declare variable $fast-insert-values := "TRUE";
 
 (: Parameters controlling the 'size' of the run :)
 declare variable $inserts-per-second  := 100;
@@ -35,6 +35,7 @@ declare variable $SOURCE-DOCUMENT-WORDS-SERVER-VARIABLE := "source-words";
 declare variable $SOURCE-DOCUMENT-WORD-COUNT-SERVER-VARIABLE := "source-words-count";
 declare variable $SOURCE-DOCUMENT-LENGTH-SERVER-VARIABLE := "source-words-doc-length"; 
 declare variable $FORESTS-SERVER-VARIABLE := "database-forests";
+declare variable $RUN-LABEL-FIELD-NAME := "run-label";
 declare variable $DEFAULT-BACKGROUND-IO-LIMIT := 0;
 declare variable $DEFAULT-FOREST-COUNT := fn:count(xdmp:hosts());
 declare variable $DEFAULT-BATCH-SIZE := 1;

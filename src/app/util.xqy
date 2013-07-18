@@ -69,7 +69,7 @@ declare function util:run-time-data-field-plurals(){
 declare function util:get-constant($constant-name) as xs:string{
     let $constants-import-statement := "import module namespace constants = 'http://marklogic.com/io-test/constants' at '/app/constants.xqy';"
     return
-    xdmp:eval($constants-import-statement||"$constants:"||$constant-name)
+    xs:string(xdmp:eval($constants-import-statement||"$constants:"||$constant-name))
 };
 
 (: All possible runtime fields as titles :)
@@ -129,3 +129,46 @@ declare function util:get-singleton-values($stats as node()*) as map:map{
     $map
 };
 
+declare function util:expected-document-count() as xs:long{
+    $constants:inserts-per-second * $constants:duration    
+};
+
+declare function util:expected-document-volume() as xs:long{
+    $constants:inserts-per-second * $constants:duration * $constants:payload    
+};
+
+declare function util:toBytes($size as xs:long) as xs:string{
+    if($size < 1000) then
+        xs:string($size)||" bytes"
+    else if($size < 1000 * 1000) then
+        util:round($size div 1000,3)||" kb"
+    else if($size < 1000 * 1000 * 1000) then
+        util:round($size div 1000 div 1000,3)||" mb"
+    else
+        util:round($size div 1000 div 1000,3)||" gb"    
+};
+
+declare function util:toShorthand($size as xs:long) as xs:string{
+    if($size < 1000) then
+        xs:string($size)||""
+    else if($size < 1000 * 1000) then
+        util:round($size div 1000,3)||"k"
+    else if($size < 1000 * 1000 * 1000) then
+        util:round($size div 1000 div 1000,3)||"m"
+    else
+        util:round($size div 1000 div 1000,3)||"bn"    
+};
+
+declare function util:date-format($date as xs:dateTime) as xs:string{
+    fn:substring(fn:replace(xs:string($date),"T"," "),1,19)
+};
+
+declare function util:round($val as xs:double,$places as xs:int){
+    xs:int($val * math:pow(10,$places)) div math:pow(10,$places)    
+};
+
+declare function util:getDefaultValuesDoc(){
+    if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)/default-values[run-label = $constants:RUN-LABEL]) then () 
+    else xdmp:invoke("/app/save-default-values.xqy",(xs:QName("db-name"),xdmp:database-name(xdmp:database()))),
+    fn:doc($constants:DEFAULT-VALUES-DOCUMENT)
+};    

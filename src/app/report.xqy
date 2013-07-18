@@ -147,7 +147,8 @@ element html{
 			)
 			else()
 		else
-		element h3{"No sub tables showing statistics when varying a single parameter vs default values as only one parameter varied for this dataset"}		
+		element h3{"No sub tables showing statistics when varying a single parameter vs default values as only one parameter varied for this dataset"},
+		element a{attribute href{"/app/remove-records.xqy?"||$constants:RUN-LABEL-FIELD-NAME||"="||$run-label},"Delete Records"}		
 		
 	}
 }	

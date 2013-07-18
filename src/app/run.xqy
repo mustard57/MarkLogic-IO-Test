@@ -50,8 +50,7 @@ declare function local:process($run-data as element(run-data)){
     (: Set up the database :)
     xdmp:invoke("/app/database-setup.xqy",(xs:QName("db-name"),$db-name,xs:QName("forest-count"),xs:int($run-data/forest-count))),
     (: Save default values if we don't already have a default values document :)
-    if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)/default-values[run-label = $constants:RUN-LABEL]) then () 
-    else xdmp:invoke("/app/save-default-values.xqy",(xs:QName("db-name"),$db-name)),
+    util:getDefaultValuesDoc()[0],(: Make sure default values doc exists :) 
     (: Set up the admin level config :) 
     let $config :=     
     (
