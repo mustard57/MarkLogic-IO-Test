@@ -19,10 +19,6 @@ declare function queue-empty() as xs:boolean{
 	queue-size() + request-count() = 0
 };
 
-declare function get-defaults() as node(){
-	fn:doc($constants:DEFAULT-VALUES-DOCUMENT)
-};
-
 declare function get-stands-written($db-name as xs:string) as xs:int{
 	fn:sum(for $forest in xdmp:database-forests(xdmp:database($db-name))
 	return
@@ -129,12 +125,23 @@ declare function util:get-singleton-values($stats as node()*) as map:map{
     $map
 };
 
-declare function util:expected-document-count() as xs:long{
-    $constants:inserts-per-second * $constants:duration    
+declare function util:get-payload($batch-map as map:map) as xs:int{
+    xs:int(map:get($batch-map,$constants:PAYLOAD-FIELD-NAME))
 };
 
-declare function util:expected-document-volume() as xs:long{
-    $constants:inserts-per-second * $constants:duration * $constants:payload    
+declare function util:get-duration($batch-map as map:map) as xs:int{
+    xs:int(map:get($batch-map,$constants:DURATION-FIELD-NAME))
+};
+
+declare function util:inserts-per-second($batch-map as map:map) as xs:int{
+    xs:int(map:get($batch-map,$constants:INSERTS-PER-SECOND-FIELD-NAME))
+};
+declare function util:expected-document-count($batch-map as map:map) as xs:long{
+    util:get-duration($batch-map) * util:inserts-per-second($batch-map)     
+};
+
+declare function util:expected-document-volume($batch-map as map:map) as xs:long{
+    util:inserts-per-second($batch-map) * util:get-duration($batch-map) * util:get-payload($batch-map)    
 };
 
 declare function util:toBytes($size as xs:long) as xs:string{
@@ -152,7 +159,7 @@ declare function util:toShorthand($size as xs:long) as xs:string{
     if($size < 1000) then
         xs:string($size)||""
     else if($size < 1000 * 1000) then
-        util:round($size div 1000,3)||"k"
+        util:round($size div 1000,3)||"k"   
     else if($size < 1000 * 1000 * 1000) then
         util:round($size div 1000 div 1000,3)||"m"
     else
@@ -168,7 +175,28 @@ declare function util:round($val as xs:double,$places as xs:int){
 };
 
 declare function util:getDefaultValuesDoc(){
-    if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)/default-values[run-label = $constants:RUN-LABEL]) then () 
+    if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)/default-values[run-label = $constants:run-label]) then () 
     else xdmp:invoke("/app/save-default-values.xqy",(xs:QName("db-name"),xdmp:database-name(xdmp:database()))),
     fn:doc($constants:DEFAULT-VALUES-DOCUMENT)
 };    
+
+declare function util:getDefaultValue($field-name){
+    util:getDefaultValuesDoc()/default-values/*[fn:node-name() = xs:QName($field-name)]/text()    
+};
+
+declare function util:getDefaultBatchDataFieldsAsMap(){
+    let $map := map:map()
+    let $null := 
+    for $key in fn:tokenize($constants:batch-data-fields,",")
+    return
+    map:put($map,$key,util:get-constant($key))
+    return
+    $map
+};
+
+declare function util:get-batch-data-map(){
+    let $map := xdmp:get-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE)
+    let $null := if(map:keys($map)) then () else xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,util:getDefaultBatchDataFieldsAsMap())
+    return 
+    xdmp:get-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE)
+};

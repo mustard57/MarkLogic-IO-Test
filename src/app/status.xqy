@@ -5,13 +5,14 @@ import module namespace util = "http://marklogic.com/io-test/util" at "/app/util
 declare namespace forest = "http://marklogic.com/xdmp/status/forest";
 
 declare variable $db-name := $constants:DATA-DB-NAME;
+declare variable $batch-data-map := util:get-batch-data-map();
 
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{},
     element body{
     
-        "Run Label is "||$constants:RUN-LABEL,element br{},
+        "Run Label is "||$constants:run-label,element br{},
         element br{},
         "Queue Size is "||xs:string(util:queue-size()),element br{},
         "Request count is "||xs:string(util:request-count()),element br{},
@@ -24,7 +25,7 @@ element html{
         	"DB "||$db-name||" is in the process of being created"
         ,
         element br{},
-        "Expected db size is "||util:toShorthand(util:expected-document-count())||" fragments",
+        "Expected db size is "||util:toShorthand(util:expected-document-count($batch-data-map))||" fragments",
         element br{},element br{},
         for $element in fn:doc($constants:RUN-CONFIG-DOCUMENT)/run-data/*
         return

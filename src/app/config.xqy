@@ -1,12 +1,14 @@
 import module namespace util  = "http://marklogic.com/io-test/util" at "/app/util.xqy";
 
+declare variable $batch-data-map := util:get-batch-data-map();
+
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{},
     element body{
         element h3{"Run Configuration"},    
         element table{
-            let $field := "RUN-LABEL"
+            let $field := "run-label"
             return
 
             element tr{
@@ -34,12 +36,12 @@ element html{
 
             element tr{
                 element td{"Expected Document Count"},
-                element td{util:toShorthand(util:expected-document-count())}
+                element td{util:toShorthand(util:expected-document-count($batch-data-map))}
             },
 
             element tr{
                 element td{"Document Volume"},
-                element td{util:toBytes(util:expected-document-volume())}
+                element td{util:toBytes(util:expected-document-volume($batch-data-map))}
             },
             element tr{
                 element td{"&nbsp;"},

@@ -119,9 +119,7 @@ element html{
 								for $q in $qnames
 								return
 								if($q != $qname) then
-									if(util:get-defaults()/default-values/*[fn:node-name() = xs:QName($q)]) then
-										cts:element-value-query(xs:QName($q),util:get-defaults()/default-values/*[fn:node-name() = xs:QName($q)]/text())
-									else()
+									cts:element-value-query(xs:QName($q),util:getDefaultValue($q))
 								else()))
 				let $stats := cts:search(/io-stats,$query)
 				return
@@ -138,9 +136,7 @@ element html{
 					return
 					if($q != $qname) then
 						(: Show the default values for the other qnames :)
-						if(util:get-defaults()/default-values/*[fn:node-name() = xs:QName($q)]) then
-							element p{$q||" : "||util:get-defaults()/default-values/*[fn:node-name() = xs:QName($q)]/text()}
-						else()
+						element p{$q||" : "||util:getDefaultValue($q)}
 					else
 					()					
 				)

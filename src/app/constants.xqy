@@ -1,12 +1,13 @@
 module namespace constants = "http://marklogic.com/io-test/constants";
 
 (: You might want to change this on a per run basis :)
-declare variable $RUN-LABEL := "test-1";
+declare variable $run-label := "batch-map-test";
 
 declare variable $run-time-data-fields := "forest-counts,batch-sizes,io-limits,merge-ratios,tree-sizes,fast-insert-values";
+declare variable $batch-data-fields := "inserts-per-second,duration,payload,run-label";
 
 (: Paramaters iterated through during the simulation :)
-declare variable $batch-sizes := "1";
+declare variable $batch-sizes := "3";
 declare variable $forest-counts := "1";
 declare variable $io-limits := "0"; 
 declare variable $merge-ratios := "2";
@@ -33,7 +34,11 @@ declare variable $RUN-CONFIG-DOCUMENT := "/io-test/run-config.xml";
 (: Constants that shouldn't need to be changed :)
 declare variable $SOURCE-DOCUMENT-WORDS-SERVER-VARIABLE := "source-words";
 declare variable $SOURCE-DOCUMENT-WORD-COUNT-SERVER-VARIABLE := "source-words-count";
-declare variable $SOURCE-DOCUMENT-LENGTH-SERVER-VARIABLE := "source-words-doc-length"; 
+declare variable $SOURCE-DOCUMENT-LENGTH-SERVER-VARIABLE := "source-words-doc-length";
+declare variable $BATCH-DATA-MAP-SERVER-VARIABLE := "batch-map";
+declare variable $INSERTS-PER-SECOND-FIELD-NAME := "inserts-per-second";
+declare variable $DURATION-FIELD-NAME := "duration";
+declare variable $PAYLOAD-FIELD-NAME := "payload"; 
 declare variable $FORESTS-SERVER-VARIABLE := "database-forests";
 declare variable $RUN-LABEL-FIELD-NAME := "run-label";
 declare variable $DEFAULT-BACKGROUND-IO-LIMIT := 0;

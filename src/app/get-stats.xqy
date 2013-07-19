@@ -9,6 +9,7 @@ declare variable $batch-start-time as xs:dateTime external;
 declare variable $run-start-time as xs:dateTime external;
 declare variable $db-name as xs:string external;
 declare variable $run-data as element(run-data) external;
+declare variable $batch-map as map:map external;
 
 declare function local:to-mb($bytes as xs:long) as xs:int{
   xs:int($bytes div 1024 div 1024)
@@ -55,9 +56,9 @@ element io-stats{
   for $element in $run-data/*
   return
   $element,
-  element expected-fragments{util:toBytes(util:expected-document-count())},
-  element expected-duration{$constants:duration},
-  element expected-footprint{util:toBytes(util:expected-document-volume())}  
+  element expected-fragments{util:toBytes(util:expected-document-count($batch-map))},
+  element expected-duration{util:get-duration($batch-map)},
+  element expected-footprint{util:toBytes(util:expected-document-volume($batch-map))}  
 }
 
 

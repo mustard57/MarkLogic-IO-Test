@@ -12,7 +12,7 @@ element default-values{
 	element io-limit{$constants:DEFAULT-BACKGROUND-IO-LIMIT},
 	element tree-size{admin:database-get-in-memory-tree-size(admin:get-configuration(),xdmp:database($db-name))},
 	element merge-ratio{admin:database-get-merge-min-ratio(admin:get-configuration(),xdmp:database($db-name))},
-	element fast-insert{$constants:DEFAULT-FAST-INSERT-VALUE}
+	element fast-insert-value{$constants:DEFAULT-FAST-INSERT-VALUE}
 })
 
 

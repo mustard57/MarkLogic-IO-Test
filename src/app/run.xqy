@@ -6,8 +6,11 @@ declare variable $run-time-data-fields := "forest-counts,batch-sizes,io-limits,m
 declare variable $db-name := $constants:DATA-DB-NAME;
 declare variable $batch-start-time := fn:current-dateTime();
 
+declare variable $input-map external;
+declare variable $batch-data-map external;
+
 (: Create the appropriate for loops from the run data :)
-declare function local:process-run-data-map($param-lists-map as map:map,$run-data-map as map:map){
+declare function local:process-run-data-map($batch-map as map:map,$param-lists-map as map:map,$run-data-map as map:map){
   if(map:keys($param-lists-map)) then
     let $param-name := (for $key in map:keys($param-lists-map) order by $key return $key)[1]
     let $param-values := map:get($param-lists-map,$param-name)
@@ -17,7 +20,7 @@ declare function local:process-run-data-map($param-lists-map as map:map,$run-dat
     for $param-value in fn:tokenize($param-values,",")
     let $null := map:put($run-data-map,$param-name,$param-value)
     return
-    local:process-run-data-map($new-map,$run-data-map)
+    local:process-run-data-map($batch-map,$new-map,$run-data-map)
   else
   let $run-data := 
   element run-data{  
@@ -28,7 +31,7 @@ declare function local:process-run-data-map($param-lists-map as map:map,$run-dat
     element {fn:replace($key,"s$","")} {map:get($run-data-map,$key)}
   }
   return
-  local:process($run-data)
+  local:process($batch-map,$run-data)
 };
 
 (: Retrieve run data from constants :)
@@ -38,13 +41,16 @@ declare function local:get-run-data-as-map(){
   (
     for $param-name in util:run-time-data-field-plurals()
     return
-    map:put($map,$param-name,util:get-constant($param-name))
+    map:put($map,$param-name,util:get-constant($param-name)),
+    for $field in fn:tokenize("inserts-per-second,duration,payload",",")
+    return
+    map:put($map,$field,util:get-constant($field))        
     ,$map
   )[last()]
 };
 
 (: Carry out the test process for a given configuration :)
-declare function local:process($run-data as element(run-data)){
+declare function local:process($batch-map as map:map,$run-data as element(run-data)){
     (: Add the run config as a document - this is used by status.xqy :)
     xdmp:invoke("/app/document-insert.xqy",(xs:QName("uri"),$constants:RUN-CONFIG-DOCUMENT,xs:QName("node"),$run-data)),
     (: Set up the database :)
@@ -63,7 +69,7 @@ declare function local:process($run-data as element(run-data)){
     return
     (
         (: Start the simulation :)
-        xdmp:invoke("/app/write-simulation.xqy",(xs:QName("db-name"),$db-name,xs:QName("run-data"),$run-data)), 
+        xdmp:invoke("/app/write-simulation.xqy",(xs:QName("db-name"),$db-name,xs:QName("batch-map"),$batch-map,xs:QName("run-data"),$run-data)), 
         (: Put this in place to make sure writes complete :)
         xdmp:sleep(5000),
         (: Record Statistics :)
@@ -72,9 +78,16 @@ declare function local:process($run-data as element(run-data)){
             xs:QName("batch-start-time"),$batch-start-time,
             xs:QName("run-start-time"),$run-start-time,
             xs:QName("db-name"),$db-name,
-            xs:QName("run-data"),$run-data)
+            xs:QName("run-data"),$run-data),
+            xs:QName("batch-map"),$batch-map
         )
     )
 };
 
-local:process-run-data-map(local:get-run-data-as-map(),map:map())
+
+let $map1 := if(map:keys($input-map)) then $input-map else local:get-run-data-as-map()
+let $map2 := if(map:keys($batch-data-map)) then $batch-data-map else util:getDefaultBatchDataFieldsAsMap()
+let $null := xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,$map2)
+return
+local:process-run-data-map($map2,$map1,map:map())
+
