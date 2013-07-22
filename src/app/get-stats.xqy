@@ -40,7 +40,7 @@ let $duration := xs:dayTimeDuration("PT"||xs:string(xs:integer($duration div xs:
 return
 element io-stats{
   element db-name{$db-name},
-  element run-label{$constants:RUN-LABEL},
+  element run-label{util:get-run-label($batch-map)},
   element batch-start-time{$batch-start-time},  
   element run-start-time{$run-start-time},
   element elapsed-time{$duration},

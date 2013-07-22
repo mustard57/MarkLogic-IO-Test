@@ -3,7 +3,7 @@ import module namespace constants = "http://marklogic.com/io-test/constants" at 
 import module namespace util = "http://marklogic.com/io-test/util" at "/app/util.xqy";
 
 
-declare variable $run-label := xdmp:get-request-field("run-label",$constants:RUN-LABEL);
+declare variable $run-label := xdmp:get-request-field("run-label",util:get-run-label(util:get-batch-data-map()));
 declare variable $stats := /io-stats[run-label = $run-label];
 
 declare function local:write-mb($uri){
@@ -144,7 +144,11 @@ element html{
 			else()
 		else
 		element h3{"No sub tables showing statistics when varying a single parameter vs default values as only one parameter varied for this dataset"},
-		element a{attribute href{"/app/remove-records.xqy?"||$constants:RUN-LABEL-FIELD-NAME||"="||$run-label},"Delete Records"}		
+		element a{attribute href{"/app/remove-records.xqy?"||$constants:RUN-LABEL-FIELD-NAME||"="||$run-label},"Delete Records"},	
+        element p{element a{attribute href{"/app/job-list.xqy"},"Job List"}},        
+        element p{element a{attribute href{"/app/config.xqy"},"Current Configuration"}},
+        element p{element a{attribute href{"/app/status.xqy"},"Status"}},            
+        element p{element a{attribute href{"/app/index.xqy"},"Home"}}        
 		
 	}
 }	

@@ -16,13 +16,16 @@ if($field != "run-label") then
 else
     map:put($batch-data-map,$field,xdmp:get-request-field($field,util:get-constant($field)))
 ,
+(: Need to set server field here, before spawning :)
+xdmp:set-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE,$run-data-map)[0],
+xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,$batch-data-map)[0],
 
 xdmp:set-response-content-type("text-html"),
 element html{
     element head{},
     element body{
         element h2{"Spawn run ..."},
-        xdmp:spawn("/app/run.xqy",(xs:QName("input-map"),map:map(),xs:QName("batch-data-map"),map:map())),  
+        xdmp:spawn("/app/run.xqy",(xs:QName("input-map"),$run-data-map,xs:QName("batch-data-map"),$batch-data-map)),  
         element table{
             for $key in map:keys($run-data-map)
             return

@@ -1,6 +1,7 @@
 import module namespace util  = "http://marklogic.com/io-test/util" at "/app/util.xqy";
 
 declare variable $batch-data-map := util:get-batch-data-map();
+declare variable $run-data-map := util:get-run-data-map();
 
 xdmp:set-response-content-type("text/html"),
 element html{
@@ -13,7 +14,7 @@ element html{
 
             element tr{
                 element td{util:element-name-to-title($field)},
-                element td{util:get-constant($field)}
+                element td{map:get($batch-data-map,$field)}
             },
 
             element tr{
@@ -26,7 +27,7 @@ element html{
 
             element tr{
                 element td{util:element-name-to-title($field)},
-                element td{util:get-constant($field)}
+                element td{map:get($batch-data-map,$field)}
             },
 
             element tr{
@@ -65,7 +66,7 @@ element html{
 
             element tr{
                 element td{util:element-name-to-title($field)},
-                element td{util:get-constant($field)}
+                element td{map:get($run-data-map,util:de-pluralize($field))}
             }
             
         },

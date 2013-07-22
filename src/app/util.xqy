@@ -125,6 +125,10 @@ declare function util:get-singleton-values($stats as node()*) as map:map{
     $map
 };
 
+declare function util:get-run-label($batch-map as map:map){
+    map:get($batch-map,$constants:RUN-LABEL-FIELD-NAME)
+};
+
 declare function util:get-payload($batch-map as map:map) as xs:int{
     xs:int(map:get($batch-map,$constants:PAYLOAD-FIELD-NAME))
 };
@@ -175,8 +179,14 @@ declare function util:round($val as xs:double,$places as xs:int){
 };
 
 declare function util:getDefaultValuesDoc(){
-    if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)/default-values[run-label = $constants:run-label]) then () 
-    else xdmp:invoke("/app/save-default-values.xqy",(xs:QName("db-name"),xdmp:database-name(xdmp:database()))),
+    if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)) then () 
+    else xdmp:invoke("/app/save-default-values.xqy",
+        (xs:QName("db-name"),xdmp:database-name(xdmp:database())),
+        <options xmlns="xdmp:eval">
+            <isolation>different-transaction</isolation>
+            <prevent-deadlocks>false</prevent-deadlocks>
+        </options>        
+    ),
     fn:doc($constants:DEFAULT-VALUES-DOCUMENT)
 };    
 
@@ -199,4 +209,8 @@ declare function util:get-batch-data-map(){
     let $null := if(map:keys($map)) then () else xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,util:getDefaultBatchDataFieldsAsMap())
     return 
     xdmp:get-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE)
+};
+
+declare function util:get-run-data-map(){
+    xdmp:get-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE)
 };

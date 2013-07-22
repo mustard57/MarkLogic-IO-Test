@@ -21,7 +21,7 @@ return
 (
 	xdmp:spawn("/app/random-text-document-write.xqy",
 	    (xs:QName("document-length"),util:get-payload($batch-map),xs:QName("batch-size"),$batch-size,xs:QName("fast-insert-value"),$fast-insert-value),$eval-options),
-	xdmp:sleep($batch-size * 1000 div util:inserts-per-second($batch-map))
+	xdmp:sleep(xs:int($batch-size * 1000 div util:inserts-per-second($batch-map)))
 )
 ,
 "Spawned "||xs:string($full-runs)||" jobs of size "||xs:string($batch-size),

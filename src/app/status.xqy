@@ -6,13 +6,14 @@ declare namespace forest = "http://marklogic.com/xdmp/status/forest";
 
 declare variable $db-name := $constants:DATA-DB-NAME;
 declare variable $batch-data-map := util:get-batch-data-map();
+declare variable $run-data-map := util:get-run-data-map();
 
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{},
     element body{
     
-        "Run Label is "||$constants:run-label,element br{},
+        "Run Label is "||util:get-run-label($batch-data-map),element br{},
         element br{},
         "Queue Size is "||xs:string(util:queue-size()),element br{},
         "Request count is "||xs:string(util:request-count()),element br{},
@@ -33,7 +34,7 @@ element html{
         element br{},
         for $field in util:run-time-data-field-plurals()
         return
-        (util:element-name-to-title($field)||" iterated through are "||util:get-constant($field),element br{}),
+        (util:element-name-to-title($field)||" iterated through are "||map:get($run-data-map,util:de-pluralize($field)),element br{}),
         element br{},
         element a {attribute href{"/app/index.xqy"},"Home"}
         

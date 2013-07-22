@@ -78,8 +78,8 @@ declare function local:process($batch-map as map:map,$run-data as element(run-da
             xs:QName("batch-start-time"),$batch-start-time,
             xs:QName("run-start-time"),$run-start-time,
             xs:QName("db-name"),$db-name,
-            xs:QName("run-data"),$run-data),
-            xs:QName("batch-map"),$batch-map
+            xs:QName("run-data"),$run-data,
+            xs:QName("batch-map"),$batch-map)
         )
     )
 };
