@@ -3,22 +3,20 @@ import module namespace util  = "http://marklogic.com/io-test/util" at "/app/lib
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{
-        element title{"Run Batch"},    
+        element title{"Create Job"},    
         element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}}    
     },
-
     element body{
-        element h1{"Run Batch"},    
-        element br{},
+        element h1{"Create Job"},
         element form{
-            attribute method {"POST"},
-            attribute action {"/app/ui/job/run-job.xqy"},
+            attribute method {"POST"},            
+            attribute action {"/app/ui/job/save-job.xqy"},
+            element br{},
             element table{
                 attribute style {"margin:  0 auto ; "},
                 attribute class {"newspaper-a"},
                 element tr{element th{"Parameter"},element th{"Value"}},
                 element tr{element td{"&nbsp;"},element td{"&nbsp;"}},
-            
                 let $field := "run-label"
                 return
                 element tr
@@ -105,7 +103,8 @@ element html{
                 attribute style{"float:left;width : 25%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/index.xqy"},"Home"}}            
             }                        
-        }            
+        }
+        
     }
 }
 
