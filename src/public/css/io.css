@@ -1,0 +1,266 @@
+/* ------------------
+ styling for the tables 
+   ------------------   */
+
+.centred
+{
+	
+	margin-left : auto;
+	margin-right : auto;
+	margin-bottom : 40px;
+	text-align: center;	
+}
+
+
+.general{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-weight: normal;
+	color: #039;
+	font-size: 16px;
+
+	border-collapse: collapse;
+
+}
+
+body
+{
+	margin-left : 10%;
+	margin-right : 10%;	
+	margin-top : 3%;
+	width : 80%;
+	line-height: 1.6em;
+}
+
+h1{
+	font-family : "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size : 24px;
+	font-weight : bold;
+	text-align : center;
+	width : 100%;
+	color: #669;	
+}
+
+h2{
+	padding-top: 5px;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	color: #669;	
+}
+
+h3{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 17px;
+	font-weight: bold;
+	text-align: left;
+	color: #669;	
+}
+
+h4
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	font-weight : normal;
+	text-align: center;
+	color: #669;	
+	margin-bottom : 2px;
+	padding-bottom : 2px;
+	margin-top : 2px;
+}
+
+form { margin: 0 auto; width : 100%;}
+
+.menu-item label,p,input,select
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	text-align: left;
+	color: #669;	
+}
+
+.menu-header 
+{
+	font-size: 14px;
+}
+
+.newspaper-a 
+{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	text-align: left;
+	border-collapse: collapse;
+	border: 1px solid #69c;	
+}
+
+.newspaper-a th
+{
+	padding: 12px 17px 12px 17px;
+	font-weight: normal;
+	font-size: 14px;
+	color: #039;
+	border-bottom: 1px dashed #69c;
+}
+.newspaper-a td
+{
+	padding: 7px 17px 7px 17px;
+	color: #669;
+}
+.newspaper-a tbody tr:hover td
+{
+	color: #339;
+	background: #d0dafd;
+}
+
+#navigation {
+	float: left;
+	background : #d0dafd;
+	border-radius : 15px;
+	padding-left : 20px; 
+	padding-top : 10px;
+	padding-bottom : 10px;		
+	width: 100%; 
+	border: 1px solid #69c;	
+}
+
+
+
+
+#summary_table{
+	width: 100%;
+	margin-bottom: 20px;
+}
+
+
+#correlation_table{
+	width: 100%;	
+}
+
+.link{
+	text-decoration : underline;
+	color: #669;	
+}	
+
+.link:hover{
+	color: #00f;
+	cursor: pointer;
+}
+
+.link:active{
+	color: #f00;
+	cursor: pointer;
+}
+
+.green{
+	background : #3BCE3B;
+}
+
+.amber{
+	background : #ffdc14;	
+}
+
+.flash{
+	background : #ff3838;
+}	
+
+#masthead{
+	border-radius: 10px;
+	border-style: solid;
+	border-width: 2px;
+	font-size : 20px;
+	width: 96%;
+	margin-left: 2%;
+	margin-right: 2%;
+	margin-top: 1%;
+	margin-bottom: 20px;	
+	color: #669;	
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;	
+}	
+
+#inputs {
+	margin-top: 25px;
+	background : #d0dafd;
+	border-radius : 15px;
+	padding-left : 20px;
+	padding-top : 10px;
+	padding-bottom : 10px;		
+	border: 1px solid #69c;
+	width : 100%;
+	float : left;
+	clear : left;
+}
+
+
+.invisible{
+	display:none;
+}
+
+.visible{
+	display:block;
+}
+
+/* The wrappers */
+#left-wrapper{
+	margin-top: 20px;	
+	margin-left:2%;
+	margin-right:auto;
+	height:auto; 
+	width:16%;	
+	float:left;
+}
+
+#middle-wrapper{
+	margin-top: 20px;
+	width: 60%;
+	float:left;
+	margin-left: 4%;	
+}
+
+#training_tickers{
+	margin-top: 20px;
+	float:left;
+	margin-left: 2%;
+	width: 14%;	
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 14px;
+	color : #ff0000;
+	text-align: center;
+	padding-bottom : 20px;
+}
+
+/* The three middle divs */
+#correlation-div{
+	width: 100%;	
+}
+
+#correlation-summary-div{
+	width: 100%;	
+}
+
+#error-message-div{
+	width: 100%;	
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 14px;
+	color : #ff0000;
+	text-align: center;
+	padding-top : 20px;
+	padding-bottom : 20px;
+	border: 1px solid #f00;	
+	margin-bottom: 20px;
+
+}
+
+/* This is the div for the stock navigator */
+#table_data{
+	margin-left: 20%;
+	margin-right: 20%;
+	width: 60%;
+}
+
+#statement_table{
+	width: 100%;
+}
+
+.stock_picks{
+	display : none;
+}
