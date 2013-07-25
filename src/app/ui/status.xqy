@@ -44,20 +44,41 @@ element html{
             element div{
                 attribute style{"float:left;width : 33%"},            
                 element h2{"Batch Configuration"},
-                for $field in util:run-time-data-field-plurals()
+                let $dont-show := fn:tokenize($constants:dont-show-in-jobs-table,",")
                 return
-                element h4{
-                   util:element-name-to-title($field)||" iterated through are "||map:get($run-data-map,util:de-pluralize($field))
-           }
+                (                
+                    for $field in util:run-time-data-field-plurals()
+                    where fn:not($field = $dont-show)                
+                    return
+                    element h4{
+                        util:element-name-to-title($field)||" iterated through are "||map:get($batch-data-map,util:de-pluralize($field))
+                    }
+                    ,                
+                    for $field in util:run-time-data-field-plurals()
+                    where $field = $dont-show                
+                    return
+                    element h4{
+                        util:element-name-to-title(util:de-pluralize($field))||" : "||map:get($batch-data-map,util:de-pluralize($field))
+                    }
+                )    
             }
         }
         ,
         element div{
-            attribute style{"margin-top : 10%"},
+            attribute style{"clear:both ; margin-top : 10%"},
             element div{
-                attribute style{"float:left;width : 100%"},            
+                attribute style{"float:left;width : 33%"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}}            
+            },                                    
+            element div{
+                attribute style{"float:left;width : 33%"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/ui/report/list-reports.xqy"},"Report List"}}
+            },                       
+            element div{
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/index.xqy"},"Home"}}            
-            }                                    
+            }
+ 
         }               
     }
 }

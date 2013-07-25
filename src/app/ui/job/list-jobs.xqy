@@ -21,7 +21,9 @@ element html{
                     return
                     element th {util:element-name-to-title($field)}
                     ,
+                    let $dont-show := for $field in fn:tokenize($constants:dont-show-in-jobs-table,",") return util:de-pluralize($field)                    
                     for $field in util:run-time-data-fields()
+                    where fn:not($field = $dont-show)
                     return
                     element th {util:element-name-to-title($field)} 
                     ,
@@ -33,14 +35,16 @@ element html{
                 },
     
                 for $job in /job
-                order by xs:int($job/id) ascending
+                order by xs:int($job/job-id) ascending
                 return
                 element tr{
                     let $field := "run-label"        
                     return
                     element td {$job/*[fn:node-name() = xs:QName($field)]}
                     ,
+                    let $dont-show := for $field in fn:tokenize($constants:dont-show-in-jobs-table,",") return util:de-pluralize($field)
                     for $field in util:run-time-data-fields()
+                    where fn:not($field = $dont-show)
                     return
                     element td {$job/*[fn:node-name() = xs:QName($field)]}
                     ,
@@ -48,8 +52,8 @@ element html{
                     return
                     element td {$job/*[fn:node-name() = xs:QName($field)]}
                     ,
-                    element td{element a{attribute href{"/app/ui/job/delete-job.xqy?id="||$job/id},"Delete Job"}},
-                    element td{element a{attribute href{"/app/ui/job/run-job.xqy?id="||$job/id},"Run Job"}}
+                    element td{element a{attribute href{"/app/ui/job/delete-job.xqy?job-id="||$job/job-id},"Delete Job"}},
+                    element td{element a{attribute href{"/app/ui/job/run-job.xqy?job-id="||$job/job-id},"Run Job"}}
                 }
             }
         }
@@ -57,15 +61,27 @@ element html{
         element div{
             attribute style{"clear:both"},
             element div{
-                attribute style{"float:left;width : 33%"},            
+                attribute style{"float:left;width : 16%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/run-config.xqy"},"Run Configuration"}}
             },
             element div{
-                attribute style{"float:left;width : 33%"},            
+                attribute style{"float:left;width : 16%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
             },
             element div{
-                attribute style{"float:left;width : 33%"},            
+                attribute style{"float:left;width : 16%"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/ui/job/create-job.xqy"},"Create Job"}}
+            },
+            element div{
+                attribute style{"float:left;width : 16%"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/delete-job.xqy"},"Delete Job"}}
+            },           
+            element div{
+                attribute style{"float:left;width : 16%"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/ui/report/list-reports.xqy"},"Report List"}}
+            },                       
+            element div{
+                attribute style{"float:left;width : 16%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/index.xqy"},"Home"}}
             }
             

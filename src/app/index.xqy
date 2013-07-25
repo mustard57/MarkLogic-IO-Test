@@ -1,3 +1,9 @@
+import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
+
+import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
+
+(: Make Sure Default values doc gets instantiated at start-up :)
+util:getDefaultValuesDoc()[0],
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{
@@ -19,6 +25,21 @@ element html{
             element h4{element a{attribute href{"/app/ui/run-config.xqy"},"Run Configuration"}},
             element h4{element a{attribute href{"/app/ui/status.xqy"},"Status"}},            
             
-            element h4{element a{attribute href{"/app/ui/show-defaults.xqy"},"Show Defaults"}}                        
+            element h4{element a{attribute href{"/app/ui/show-defaults.xqy"},"Show Defaults"}},
+ 
+            if(util:isTaskScheduled()) then 
+            element h4{
+                element a{
+                    attribute href{"/app/procs/activate-job-queue-processing.xqy?"||$constants:MODE-FIELD-NAME||"="||$constants:DELETE-MODE},
+                    "Scheduled Processing in Operation - click to stop"
+                }
+            }
+            else
+            element h4{
+                element a{
+                    attribute href{"/app/procs/activate-job-queue-processing.xqy?"||$constants:MODE-FIELD-NAME||"="||$constants:CREATE-MODE},
+                    "Click to enable scheduled processing"
+                }
+            }                                               
     }
 }

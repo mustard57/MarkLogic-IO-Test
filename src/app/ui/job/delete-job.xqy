@@ -1,5 +1,6 @@
+import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
-declare variable $job-id := xdmp:get-request-field("id","NONE");
+declare variable $job-id := xdmp:get-request-field($constants:JOB-ID-FIELD-NAME,"NONE");
 
 xdmp:set-response-content-type("text/html"),
 element html{
@@ -9,12 +10,12 @@ element html{
     },
     element body{
         element h1{"Job Deletion"},
-        if(/job[id = $job-id]) then
+        if(/job[job-id = $job-id]) then
         (
-            let $count := xdmp:estimate(/job[id = $job-id])
+            let $count := xdmp:estimate(/job[job-id = $job-id])
             return
             (
-                for $doc in /job[id = $job-id]
+                for $doc in /job[job-id = $job-id]
                 return
                 xdmp:document-delete(fn:base-uri($doc)), 
                 

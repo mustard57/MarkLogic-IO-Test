@@ -13,12 +13,18 @@ element html{
         element h1{"IO Test System Default Configuration Values"},
         element div{
             attribute style{"height : 60%"},
-            for $element in util:getDefaultValuesDoc()/default-values/*
+            let $defaults := util:getDefaultValuesDoc()
             return
-            element h4{
-                util:element-name-to-title($element/fn:node-name())||" : "||
-                xs:string($element)
-            }
+            if($defaults) then
+                for $element in $defaults/default-values/*
+                return
+                element h4{
+                    util:element-name-to-title($element/fn:node-name())||" : "||
+                    xs:string($element)
+                }
+            else
+                element h4{"Please refresh if you see this message"}
+                
         }, 
         element div{
             attribute style{"clear:both"},

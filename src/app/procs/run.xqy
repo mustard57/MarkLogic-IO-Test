@@ -2,7 +2,6 @@ import module namespace admin  = "http://marklogic.com/xdmp/admin" at "/MarkLogi
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
 
-declare variable $run-time-data-fields := "forest-counts,batch-sizes,io-limits,merge-ratios,tree-sizes";
 declare variable $db-name := $constants:DATA-DB-NAME;
 declare variable $batch-start-time := fn:current-dateTime();
 
@@ -87,7 +86,8 @@ declare function local:process($batch-map as map:map,$run-data as element(run-da
 
 let $map1 := if(map:keys($input-map)) then $input-map else local:get-run-data-as-map()
 let $map2 := if(map:keys($batch-data-map)) then $batch-data-map else util:getDefaultBatchDataFieldsAsMap()
-let $null := xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,$map2)
+let $null := util:set-batch-data-map($map1 + $map2)
+let $null := if(util:restart-required($input-map)) then () else util:delete-job(map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME))
 return
 local:process-run-data-map($map2,$map1,map:map())
 

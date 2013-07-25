@@ -6,6 +6,25 @@ import module namespace constants = "http://marklogic.com/io-test/constants" at 
 
 declare namespace server-status = "http://marklogic.com/xdmp/status/server";
 declare namespace forest = "http://marklogic.com/xdmp/status/forest";
+declare namespace group = "http://marklogic.com/xdmp/group";
+
+
+declare function isTaskScheduled() as xs:boolean{
+    if(
+    for $task in admin:group-get-scheduled-tasks(admin:get-configuration(),xdmp:group())
+    where $task/group:task-path/text() = $constants:RUN-JOB-TASK
+    return
+    $task) then fn:true()
+    else fn:false()
+};
+
+declare function isScheduledTask() as xs:boolean{
+        (xdmp:server() = admin:group-get-taskserver-id(admin:get-configuration(),xdmp:group()))
+        and
+        (queue-size() = 0)
+        and
+        (request-count() = 1)        
+};
 
 declare function queue-size() as xs:int{    
     xs:int(xdmp:server-status(xdmp:host(),admin:group-get-taskserver-id(admin:get-configuration(),xdmp:group()))//server-status:queue-size/fn:number())
@@ -178,7 +197,7 @@ declare function util:round($val as xs:double,$places as xs:int){
 
 declare function util:getDefaultValuesDoc(){
     if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)) then () 
-    else xdmp:invoke("/app/save-default-values.xqy",
+    else xdmp:invoke("/app/procs/save-default-values.xqy",
         (xs:QName("db-name"),xdmp:database-name(xdmp:database())),
         <options xmlns="xdmp:eval">
             <isolation>different-transaction</isolation>
@@ -203,12 +222,33 @@ declare function util:getDefaultBatchDataFieldsAsMap(){
 };
 
 declare function util:get-batch-data-map(){
-    let $map := xdmp:get-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE)
-    let $null := if(map:keys($map)) then () else xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,util:getDefaultBatchDataFieldsAsMap())
+    let $map := map:map(fn:doc($constants:BATCH-CONFIG-DOCUMENT)/*) 
     return 
-    xdmp:get-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE)
+    if(map:keys($map)) then $map else util:getDefaultBatchDataFieldsAsMap()
 };
 
 declare function util:get-run-data-map(){
     xdmp:get-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE)
+};
+
+declare function util:set-batch-data-map($map){
+    xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,$map)[0],
+    xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:BATCH-CONFIG-DOCUMENT,xs:QName("node"),document{$map}))
+};
+
+declare function util:set-run-data-map($map){
+    xdmp:set-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE,$map)[0],
+    xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:RUN-CONFIG-DOCUMENT,xs:QName("node"),document{$map}))
+};
+
+declare function util:restart-required($run-data-map) as xs:boolean{
+    let $required-threads := xs:int(map:get($run-data-map,"thread-count"))
+    let $null := xdmp:log("Required threads is "||xs:string($required-threads))
+    return
+    fn:not($required-threads = admin:taskserver-get-threads(admin:get-configuration(),xdmp:group()))
+};
+
+declare function util:delete-job($job-id){
+    let $null := xdmp:log("Job id is "||xs:string($job-id))
+    for $doc in /job[job-id = xs:string($job-id)] return xdmp:document-delete(fn:base-uri($doc))
 };

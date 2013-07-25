@@ -2,9 +2,9 @@ import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
 
-let $job-id  := xdmp:eval("fn:max((xs:int(/job/id) + 1,1))") 
+let $job-id  := xdmp:eval("fn:max((xs:int(/job/job-id) + 1,1))") 
 let $doc := element job{
-    element id{$job-id},
+    element job-id{$job-id},
     for $field in util:run-time-data-fields()
     return
     element {$field} {xdmp:get-request-field($field,util:getDefaultValue($field))},

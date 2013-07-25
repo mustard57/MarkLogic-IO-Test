@@ -10,6 +10,8 @@ declare variable $source-word-count := local:source-word-count();
 declare variable $source-words := local:source-words();
 declare variable $forests := xdmp:database-forests(xdmp:database());
 
+
+
 declare function local:unset-server-fields(){
   (
     xdmp:set-server-field($constants:SOURCE-DOCUMENT-WORDS-SERVER-VARIABLE,()),
@@ -19,7 +21,7 @@ declare function local:unset-server-fields(){
 };
 
 declare function local:get-document-words(){
-  let $doc := xdmp:document-get($constants:SOURCE-DOCUMENT)
+  let $doc := xdmp:eval("declare variable $uri external ; fn:doc($uri)",(xs:QName("uri"),$constants:SOURCE-DOCUMENT),$constants:RECORDS-DB-EVAL-OPTIONS)
   let $words := 
   for $token in cts:tokenize($doc)
   return

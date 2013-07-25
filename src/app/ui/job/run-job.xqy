@@ -4,16 +4,20 @@ import module namespace constants = "http://marklogic.com/io-test/constants" at 
 declare variable $run-data-map := map:map();
 declare variable $batch-data-map := map:map();
 
-declare variable $job-id := xdmp:get-request-field("id");
+(: Get Job ID :)
+(: If called with no arguments at all, assume job-id = 0 - a special case whihc will run the job with the lowest id :)
+declare variable $job-id := if(xdmp:get-request-field-names()) then xdmp:get-request-field($constants:JOB-ID-FIELD-NAME) else "0";
 
 declare function local:get-field-from-job($job-doc,$field-name){
     xs:string($job-doc/job/*[fn:node-name() = xs:QName($field-name)])
 };
 
+(: So if we have a job-id, run a job :)
 if(fn:not(fn:empty($job-id))) then
 (
-    let $job-id := if($job-id != "0") then xs:int($job-id) else fn:min(xs:int(/job/id))
-    let $job-doc := fn:doc(fn:base-uri((/job[id = $job-id])[1])) 
+    let $job-id := if($job-id != "0") then xs:int($job-id) else fn:min(xs:int(/job/job-id))
+    let $job-doc := fn:doc(fn:base-uri((/job[job-id = $job-id])[1]))
+    let $null := map:put($batch-data-map,$constants:JOB-ID-FIELD-NAME,$job-id) 
     return
     (
         for $field in util:run-time-data-fields()
@@ -45,7 +49,7 @@ else
 
 (: Need to set server field here, before spawning :)
 xdmp:set-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE,$run-data-map)[0],
-xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,$batch-data-map)[0],
+util:set-batch-data-map($batch-data-map),
 
 xdmp:set-response-content-type("text/html"),
 element html{
@@ -56,7 +60,11 @@ element html{
     element body{
         if(map:keys($run-data-map)) then
         (
-            if(util:queue-empty()) then
+            xdmp:log("Queue Size is "||xs:string(util:queue-size())),
+            xdmp:log("Request Count is "||xs:string(util:request-count())),
+            xdmp:log("Job ID is "||xs:string($job-id)),
+            xdmp:log("Run Label is "||map:get($batch-data-map,"run-label")),            
+            if(util:queue-empty() or util:isScheduledTask()) then
             (
                 element h1{"Job Running"},
                 xdmp:spawn("/app/procs/run.xqy",(xs:QName("input-map"),$run-data-map,xs:QName("batch-data-map"),$batch-data-map)),   
@@ -89,7 +97,8 @@ element html{
             else
             (
                 element h1{"Job Not Running"},            
-                element h4{"Your run could not be spawned as not all previous jobs have completed"}
+                element h4{"Your run could not be spawned as not all previous jobs have completed"},
+                xdmp:log("Your run could not be spawned as not all previous jobs have completed")
             )                
         )
         else
