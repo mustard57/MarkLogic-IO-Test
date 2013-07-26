@@ -1,11 +1,13 @@
 import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
+import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
+
 
 declare variable $db-name as xs:string external;
-declare variable $run-data as element(run-data) external;
+declare variable $run-data-map as map:map external;
 declare variable $batch-map as map:map external;
 
-declare variable $fast-insert-value as xs:boolean := xs:boolean(fn:lower-case($run-data/fast-insert-value/text()));  
-declare variable $batch-size := xs:int($run-data/batch-size);
+declare variable $fast-insert-value as xs:boolean := xs:boolean(fn:lower-case(map:get($run-data-map,$constants:FAST-INSERT-VALUE-FIELD-NAME)));  
+declare variable $batch-size as xs:int := map:get($run-data-map,$constants:BATCH-SIZE-FIELD-NAME);
 declare variable $iterations := util:expected-document-count($batch-map);
 declare variable $full-runs := xs:int($iterations div $batch-size);
 declare variable $remainder := $iterations - ( $full-runs * $batch-size);

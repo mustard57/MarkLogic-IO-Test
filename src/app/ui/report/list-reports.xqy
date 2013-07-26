@@ -28,6 +28,7 @@ element html{
                 return
                 element tr{
                     element td{
+
                         element a{
                             attribute href{"/app/ui/report/report.xqy?run-label="||$run-label},
                             $run-label
@@ -46,12 +47,16 @@ element html{
         },
         element div{
             attribute style{"margin-top : 10%"},
+           element div{
+                attribute style{"float:left;width : 33%"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/report/remove-all-reports.xqy"},"Remove All Reports"}}            
+            },             
             element div{
-                attribute style{"float:left;width : 50%"},            
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/index.xqy"},"Home"}}            
             },
-                                                element div{
-                attribute style{"float:left;width : 50%"},            
+            element div{
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
             }
                                     

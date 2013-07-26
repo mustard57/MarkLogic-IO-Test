@@ -8,7 +8,7 @@ declare namespace forest = "http://marklogic.com/xdmp/status/forest";
 declare variable $batch-start-time as xs:dateTime external;
 declare variable $run-start-time as xs:dateTime external;
 declare variable $db-name as xs:string external;
-declare variable $run-data as element(run-data) external;
+declare variable $run-data-map as map:map external;
 declare variable $batch-map as map:map external;
 
 declare function local:to-mb($bytes as xs:long) as xs:int{
@@ -53,9 +53,9 @@ element io-stats{
   element journal-write-mb{local:database-sum("journal-write-bytes")},
   element merge-read-mb{local:database-sum("merge-read-bytes")},  
   element merge-write-mb{local:database-sum("merge-write-bytes")},
-  for $element in $run-data/*
+  for $key in map:keys($run-data-map)
   return
-  $element,
+  element {$key} {map:get($run-data-map,$key)},
   element expected-fragments{util:toBytes(util:expected-document-count($batch-map))},
   element expected-duration{util:get-duration($batch-map)},
   element expected-footprint{util:toBytes(util:expected-document-volume($batch-map))}  

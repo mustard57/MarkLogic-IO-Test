@@ -12,7 +12,19 @@ xdmp:set-response-content-type("text/html"),
 element html{
     element head{
         element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}},
-        element title {"Job deleted"}    
+        element title {"Job deleted"},
+        element script{attribute src{"/public/js/jquery-1.9.0.js"}," "},
+        element script{
+            attribute type{"text/javascript"},
+            'var timer;
+
+             timer_func = function() {
+                location.replace("/app/index.xqy");
+             };
+
+             timer = setTimeout(timer_func,3000);'
+         }
+            
     },
     element body{
         element h1{"Activating / Deactivating Queue Processing"},

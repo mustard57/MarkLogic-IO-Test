@@ -9,7 +9,7 @@ let $doc := element job{
     return
     element {$field} {xdmp:get-request-field($field,util:getDefaultValue($field))},
     
-    for $field in fn:tokenize("inserts-per-second,duration,payload,run-label",",")        
+    for $field in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)        
     return
     element {$field} {xdmp:get-request-field($field,util:getDefaultValue($field))}
 }
@@ -22,7 +22,19 @@ xdmp:set-response-content-type("text/html"),
 element html{
     element head{
         element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}},
-        element title{"Job Saved"}
+        element title{"Job Saved"},
+        element script{attribute src{"/public/js/jquery-1.9.0.js"}," "},
+        element script{
+            attribute type{"text/javascript"},
+            'var timer;
+
+             timer_func = function() {
+                location.replace("/app/ui/job/list-jobs.xqy");
+             };
+
+             timer = setTimeout(timer_func,3000);'
+         }
+        
     },
     element body{
         element h1{"Job Saved"},

@@ -75,9 +75,9 @@ declare function util:de-pluralize($field){
 
 (: All possible run-time fields, in their plural form :)
 declare function util:run-time-data-field-plurals(){
-    for $field in fn:tokenize($constants:run-time-data-fields,",")
+    for $field in $constants:run-time-data-fields
     return
-    $field
+    $field||"s"
 };
 
 (: Get a specific constant :)
@@ -87,16 +87,14 @@ declare function util:get-constant($constant-name) as xs:string{
 
 (: All possible runtime fields as titles :)
 declare function util:run-time-data-field-titles(){
-    for $field in util:run-time-data-field-plurals()
+    for $field in util:run-time-data-fields()
     return
-    util:element-name-to-title(fn:replace($field,"s$",""))
+    util:element-name-to-title($field)
 };    
 
 (: All possible runtime fields, in singleton form :)
 declare function util:run-time-data-fields(){
-    for $field in util:run-time-data-field-plurals()
-    return
-    util:de-pluralize($field)
+    $constants:run-time-data-fields
 };    
 
 (: For a given run, show those fields that were not varied :)
@@ -147,15 +145,15 @@ declare function util:get-run-label($batch-map as map:map){
 };
 
 declare function util:get-payload($batch-map as map:map) as xs:int{
-    xs:int(map:get($batch-map,$constants:PAYLOAD-FIELD-NAME))
+    map:get($batch-map,$constants:PAYLOAD-FIELD-NAME)
 };
 
 declare function util:get-duration($batch-map as map:map) as xs:int{
-    xs:int(map:get($batch-map,$constants:DURATION-FIELD-NAME))
+    map:get($batch-map,$constants:DURATION-FIELD-NAME)
 };
 
 declare function util:inserts-per-second($batch-map as map:map) as xs:int{
-    xs:int(map:get($batch-map,$constants:INSERTS-PER-SECOND-FIELD-NAME))
+    map:get($batch-map,$constants:INSERTS-PER-SECOND-FIELD-NAME)
 };
 declare function util:expected-document-count($batch-map as map:map) as xs:long{
     util:get-duration($batch-map) * util:inserts-per-second($batch-map)     
@@ -214,7 +212,7 @@ declare function util:getDefaultValue($field-name){
 declare function util:getDefaultBatchDataFieldsAsMap(){
     let $map := map:map()
     let $null := 
-    for $key in fn:tokenize($constants:batch-data-fields,",")
+    for $key in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)
     return
     map:put($map,$key,util:get-constant($key))
     return
@@ -228,27 +226,41 @@ declare function util:get-batch-data-map(){
 };
 
 declare function util:get-run-data-map(){
-    xdmp:get-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE)
+    map:map(fn:doc($constants:RUN-CONFIG-DOCUMENT)/*)
 };
 
 declare function util:set-batch-data-map($map){
-    xdmp:set-server-field($constants:BATCH-DATA-MAP-SERVER-VARIABLE,$map)[0],
+    xdmp:log("Setting batch data map - key count is "||xs:string(fn:count(map:keys($map))),"debug"),
     xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:BATCH-CONFIG-DOCUMENT,xs:QName("node"),document{$map}))
 };
 
 declare function util:set-run-data-map($map){
-    xdmp:set-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE,$map)[0],
+    xdmp:log("Setting batch data map - key count is "||xs:string(fn:count(map:keys($map))),"debug"),
     xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:RUN-CONFIG-DOCUMENT,xs:QName("node"),document{$map}))
 };
 
 declare function util:restart-required($run-data-map) as xs:boolean{
     let $required-threads := xs:int(map:get($run-data-map,"thread-count"))
-    let $null := xdmp:log("Required threads is "||xs:string($required-threads))
+    let $null := xdmp:log("Required threads is "||xs:string($required-threads),"info")
     return
     fn:not($required-threads = admin:taskserver-get-threads(admin:get-configuration(),xdmp:group()))
 };
 
 declare function util:delete-job($job-id){
-    let $null := xdmp:log("Job id is "||xs:string($job-id))
+    let $null := xdmp:log("Job id is "||xs:string($job-id),"debug")
     for $doc in /job[job-id = xs:string($job-id)] return xdmp:document-delete(fn:base-uri($doc))
+};
+
+declare function util:is-job-running($job as element(job)){
+    let $batch-data-map := util:get-batch-data-map()
+    return
+    ($job/job-id = map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME))
+    and
+    fn:not(queue-empty())
+};
+
+declare function util:sort-types($map){
+    for $field in ($constants:FOREST-COUNT-FIELD-NAME,$constants:BATCH-SIZE-FIELD-NAME,$constants:IO-LIMIT-FIELD-NAME,
+        $constants:TREE-SIZE-FIELD-NAME,$constants:MERGE-RATIO-FIELD-NAME,$constants:THREAD-COUNT-FIELD-NAME)
+    return map:put($map,$field,xs:int(map:get($map,$field)))
 };

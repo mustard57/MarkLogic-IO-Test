@@ -21,16 +21,11 @@ declare function local:process-run-data-map($batch-map as map:map,$param-lists-m
     return
     local:process-run-data-map($batch-map,$new-map,$run-data-map)
   else
-  let $run-data := 
-  element run-data{  
-    for $key in map:keys($run-data-map)
-    order by $key
-    return
-    (: De-pluralize :)
-    element {fn:replace($key,"s$","")} {map:get($run-data-map,$key)}
-  }
+  let $singleton-run-data-map := map:map()
+  let $null := for $key in map:keys($run-data-map) return map:put($singleton-run-data-map,fn:replace($key,"s$",""),map:get($run-data-map,$key))
+  let $null := util:sort-types($singleton-run-data-map)  
   return
-  local:process($batch-map,$run-data)
+  local:process($batch-map,$singleton-run-data-map)
 };
 
 (: Retrieve run data from constants :)
@@ -41,7 +36,7 @@ declare function local:get-run-data-as-map(){
     for $param-name in util:run-time-data-field-plurals()
     return
     map:put($map,$param-name,util:get-constant($param-name)),
-    for $field in fn:tokenize("inserts-per-second,duration,payload",",")
+    for $field in $constants:batch-data-fields
     return
     map:put($map,$field,util:get-constant($field))        
     ,$map
@@ -49,26 +44,32 @@ declare function local:get-run-data-as-map(){
 };
 
 (: Carry out the test process for a given configuration :)
-declare function local:process($batch-map as map:map,$run-data as element(run-data)){
+declare function local:process($batch-map as map:map,$run-data-map as map:map){
     (: Add the run config as a document - this is used by status.xqy :)
-    xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:RUN-CONFIG-DOCUMENT,xs:QName("node"),$run-data)),
+    xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:RUN-CONFIG-DOCUMENT,xs:QName("node"),document{$run-data-map})),
     (: Set up the database :)
-    xdmp:invoke("/app/procs/database-setup.xqy",(xs:QName("db-name"),$db-name,xs:QName("forest-count"),xs:int($run-data/forest-count))),
+    xdmp:invoke("/app/procs/database-setup.xqy",(xs:QName("db-name"),$db-name,xs:QName("forest-count"),map:get($run-data-map,$constants:FOREST-COUNT-FIELD-NAME))),
     (: Save default values if we don't already have a default values document :)
     util:getDefaultValuesDoc()[0],(: Make sure default values doc exists :) 
     (: Set up the admin level config :) 
     let $config :=     
     (
-        admin:save-configuration(admin:group-set-background-io-limit(admin:get-configuration(),xdmp:group(),xs:int($run-data/io-limit))),
-        admin:save-configuration(admin:database-set-in-memory-tree-size(admin:get-configuration(),xdmp:database($db-name),xs:int($run-data/tree-size))),
-        admin:save-configuration(admin:database-set-merge-min-ratio(admin:get-configuration(),xdmp:database($db-name),xs:int($run-data/merge-ratio)))
+        admin:save-configuration(
+            admin:group-set-background-io-limit(
+                admin:get-configuration(),xdmp:group(),map:get($run-data-map,$constants:FOREST-COUNT-FIELD-NAME))),
+        admin:save-configuration(
+            admin:database-set-in-memory-tree-size(
+                admin:get-configuration(),xdmp:database($db-name),map:get($run-data-map,$constants:TREE-SIZE-FIELD-NAME))),
+        admin:save-configuration(
+            admin:database-set-merge-min-ratio(
+                admin:get-configuration(),xdmp:database($db-name),map:get($run-data-map,$constants:MERGE-RATIO-FIELD-NAME)))
     )   
     (: Start timing now :)
     let $run-start-time := xdmp:eval("fn:current-dateTime()")
     return
     (
         (: Start the simulation :)
-        xdmp:invoke("/app/procs/write-simulation.xqy",(xs:QName("db-name"),$db-name,xs:QName("batch-map"),$batch-map,xs:QName("run-data"),$run-data)), 
+        xdmp:invoke("/app/procs/write-simulation.xqy",(xs:QName("db-name"),$db-name,xs:QName("batch-map"),$batch-map,xs:QName("run-data-map"),$run-data-map)), 
         (: Put this in place to make sure writes complete :)
         xdmp:sleep(5000),
         (: Record Statistics :)
@@ -77,12 +78,22 @@ declare function local:process($batch-map as map:map,$run-data as element(run-da
             xs:QName("batch-start-time"),$batch-start-time,
             xs:QName("run-start-time"),$run-start-time,
             xs:QName("db-name"),$db-name,
-            xs:QName("run-data"),$run-data,
+            xs:QName("run-data-map"),$run-data-map,
             xs:QName("batch-map"),$batch-map)
         )
     )
 };
 
+if(util:restart-required($input-map)) then
+(
+    xdmp:log("Run configuration required server restart","info"),
+    admin:save-configuration-without-restart(
+        admin:taskserver-set-threads(
+            admin:get-configuration(),xdmp:group(),xs:int(map:get($input-map,$constants:THREAD-COUNT-FIELD-NAME)))),
+    xdmp:restart(xdmp:hosts(),"IO Testing Run Configuration required restart") 
+)
+else 
+util:delete-job(map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME)),
 
 let $map1 := if(map:keys($input-map)) then $input-map else local:get-run-data-as-map()
 let $map2 := if(map:keys($batch-data-map)) then $batch-data-map else util:getDefaultBatchDataFieldsAsMap()

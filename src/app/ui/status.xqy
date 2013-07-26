@@ -8,11 +8,27 @@ declare variable $db-name := $constants:DATA-DB-NAME;
 declare variable $batch-data-map := util:get-batch-data-map();
 declare variable $run-data-map := util:get-run-data-map();
 
+
+
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{
         element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}},
-        element title{"MarkLogic IO Test System Status"}    
+        element script{attribute src{"/public/js/jquery-1.9.0.js"}," "},
+        element title{"MarkLogic IO Test System Status"},
+        element script{
+            attribute type{"text/javascript"},
+            'var timer;
+
+             timer_func = function() {
+                timer = setTimeout(timer_func,7000);
+                location.reload();
+             };
+
+             timer = setTimeout(timer_func,7000);'
+         }
+            
+            
     },
     element body{
         element h1{"MarkLogic IO Test System Status"},
@@ -33,34 +49,39 @@ element html{
                 	element h4{"DB "||$db-name||" : in the process of being created"}
                 ,
                 element h4{"Expected db size : "||util:toShorthand(util:expected-document-count($batch-data-map))||" fragments"}
+                ,
+                element h2{"Environment"},                                                                    
+                for $field in util:run-time-data-fields()
+                where $field = $constants:environment-fields                
+                return
+                element h4{
+                    util:element-name-to-title($field)||" : "||map:get($batch-data-map,$field)
+                }
+                
             },
             element div{
                 attribute style{"float:left;width : 33%"},            
                 element h2{"Current Iteration Configuration"},
-                for $element in fn:doc($constants:RUN-CONFIG-DOCUMENT)/run-data/*
+                let $run-data-map := util:get-run-data-map()
+                return                
+                for $key in map:keys($run-data-map)
+                where fn:not($key = $constants:environment-fields)                
                 return
-                element h4{util:element-name-to-title($element/fn:node-name())||" : "||xs:string($element)}
+                element h4{util:element-name-to-title($key)||" : "||map:get($run-data-map,$key)}
+            
+                
             },
             element div{
                 attribute style{"float:left;width : 33%"},            
                 element h2{"Batch Configuration"},
-                let $dont-show := fn:tokenize($constants:dont-show-in-jobs-table,",")
-                return
-                (                
-                    for $field in util:run-time-data-field-plurals()
-                    where fn:not($field = $dont-show)                
+
+                    for $field in util:run-time-data-fields()
+                    where fn:not($field = $constants:environment-fields)                
                     return
                     element h4{
-                        util:element-name-to-title($field)||" iterated through are "||map:get($batch-data-map,util:de-pluralize($field))
+                        util:element-name-to-title($field)||"s iterated through are "||map:get($batch-data-map,$field)
                     }
-                    ,                
-                    for $field in util:run-time-data-field-plurals()
-                    where $field = $dont-show                
-                    return
-                    element h4{
-                        util:element-name-to-title(util:de-pluralize($field))||" : "||map:get($batch-data-map,util:de-pluralize($field))
-                    }
-                )    
+    
             }
         }
         ,

@@ -24,9 +24,9 @@ if(fn:not(fn:empty($job-id))) then
         return
             map:put($run-data-map,$field,local:get-field-from-job($job-doc,$field))    
         ,
-        for $field in fn:tokenize("inserts-per-second,duration,payload,run-label",",")
+        for $field in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)
         return
-        if($field != "run-label") then
+        if($field != $constants:RUN-LABEL-FIELD-NAME) then
             map:put($batch-data-map,$field,xs:int(local:get-field-from-job($job-doc,$field)))
         else
             map:put($batch-data-map,$field,local:get-field-from-job($job-doc,$field))
@@ -38,32 +38,41 @@ else
     return
     map:put($run-data-map,$field,xdmp:get-request-field($field,util:getDefaultValue($field)))
     ,
-    for $field in fn:tokenize("inserts-per-second,duration,payload,run-label",",")
+    for $field in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)
     return
-    if($field != "run-label") then
+    if($field != $constants:RUN-LABEL-FIELD-NAME) then
         map:put($batch-data-map,$field,xs:int(xdmp:get-request-field($field,util:get-constant($field))))
     else
         map:put($batch-data-map,$field,xdmp:get-request-field($field,util:get-constant($field)))
 )
 ,
 
-(: Need to set server field here, before spawning :)
-xdmp:set-server-field($constants:RUN-DATA-MAP-SERVER-VARIABLE,$run-data-map)[0],
-util:set-batch-data-map($batch-data-map),
-
+xdmp:log("Run Job called","info"),
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{
         element title{"Run Batch"},    
-        element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}}        
+        element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}},
+        element script{attribute src{"/public/js/jquery-1.9.0.js"}," "},
+        element script{
+            attribute type{"text/javascript"},
+            'var timer;
+
+             timer_func = function() {
+                location.replace("/app/ui/job/list-jobs.xqy");
+             };
+
+             timer = setTimeout(timer_func,3000);'
+         }
+                
     },
     element body{
         if(map:keys($run-data-map)) then
         (
-            xdmp:log("Queue Size is "||xs:string(util:queue-size())),
-            xdmp:log("Request Count is "||xs:string(util:request-count())),
-            xdmp:log("Job ID is "||xs:string($job-id)),
-            xdmp:log("Run Label is "||map:get($batch-data-map,"run-label")),            
+            xdmp:log("Queue Size is "||xs:string(util:queue-size()),"info"),
+            xdmp:log("Request Count is "||xs:string(util:request-count()),"info"),
+            xdmp:log("Job ID is "||xs:string($job-id),"info"),
+            xdmp:log("Run Label is "||map:get($batch-data-map,$constants:RUN-LABEL-FIELD-NAME),"info"),            
             if(util:queue-empty() or util:isScheduledTask()) then
             (
                 element h1{"Job Running"},
@@ -98,13 +107,14 @@ element html{
             (
                 element h1{"Job Not Running"},            
                 element h4{"Your run could not be spawned as not all previous jobs have completed"},
-                xdmp:log("Your run could not be spawned as not all previous jobs have completed")
+                xdmp:log("Your run could not be spawned as not all previous jobs have completed","info")
             )                
         )
         else
         (
             element h1{"Job Not Running"},        
-            element h4{"No job found with id "||$job-id}
+            element h4{"No job found with id "||$job-id},
+            xdmp:log("No job found with id "||$job-id,"info")            
         )
         ,
         element br{},

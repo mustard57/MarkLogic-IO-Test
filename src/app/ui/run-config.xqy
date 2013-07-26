@@ -1,4 +1,6 @@
 import module namespace util  = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
+import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
+
 
 declare variable $batch-data-map := util:get-batch-data-map();
 declare variable $run-data-map := util:get-run-data-map();
@@ -13,7 +15,7 @@ element html{
         element h1{"IO Test System Run Configuration"},    
         element div{
             attribute style{"height 60%"},
-            let $field := "run-label"
+            let $field := $constants:RUN-LABEL-FIELD-NAME
             return
 
             element h4{
@@ -22,7 +24,7 @@ element html{
             },
 
             element h2{"DB Statistics"},
-            for $field in fn:tokenize("inserts-per-second,duration,payload",",")
+            for $field in $constants:batch-data-fields
             return
 
             element h4{

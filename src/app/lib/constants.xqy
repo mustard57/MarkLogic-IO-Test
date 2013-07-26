@@ -3,9 +3,10 @@ module namespace constants = "http://marklogic.com/io-test/constants";
 (: You might want to change this on a per run basis :)
 declare variable $run-label := "batch-map-test";
 
-declare variable $run-time-data-fields := "forest-counts,batch-sizes,io-limits,merge-ratios,tree-sizes,fast-insert-values,thread-counts,host-counts,host-types,file-system-formats,disk-types";
-declare variable $batch-data-fields := "inserts-per-second,duration,payload,run-label";
-declare variable $dont-show-in-jobs-table := "host-counts,host-types,file-system-formats,disk-types";
+declare variable $run-time-data-fields := ($FOREST-COUNT-FIELD-NAME,$BATCH-SIZE-FIELD-NAME,$IO-LIMIT-FIELD-NAME,$MERGE-RATIO-FIELD-NAME,$TREE-SIZE-FIELD-NAME,
+    $FAST-INSERT-VALUE-FIELD-NAME,$THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
+declare variable $batch-data-fields := ($INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME);
+declare variable $environment-fields := ($HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
 
 (: Parameters controlling the 'size' of the run :)
 declare variable $inserts-per-second  := 10;
@@ -44,6 +45,17 @@ declare variable $INSERTS-PER-SECOND-FIELD-NAME := "inserts-per-second";
 declare variable $DURATION-FIELD-NAME := "duration";
 declare variable $PAYLOAD-FIELD-NAME := "payload"; 
 declare variable $RUN-LABEL-FIELD-NAME := "run-label";
+declare variable $FOREST-COUNT-FIELD-NAME := "forest-count";
+declare variable $BATCH-SIZE-FIELD-NAME := "batch-size";
+declare variable $IO-LIMIT-FIELD-NAME := "io-limit";
+declare variable $TREE-SIZE-FIELD-NAME := "tree-size";
+declare variable $MERGE-RATIO-FIELD-NAME := "merge-ratio";
+declare variable $FAST-INSERT-VALUE-FIELD-NAME := "fast-insert-value";
+declare variable $THREAD-COUNT-FIELD-NAME := "thread-count";
+declare variable $HOST-COUNT-FIELD-NAME := "host-count";
+declare variable $HOST-TYPE-FIELD-NAME := "host-type";
+declare variable $FILE-SYSTEM-FORMAT-FIELD-NAME := "file-system-format";
+declare variable $DISK-TYPE-FIELD-NAME := "disk-type";
 declare variable $MODE-FIELD-NAME := "mode";
 declare variable $JOB-ID-FIELD-NAME := "job-id";
 declare variable $CREATE-MODE := "create";

@@ -1,4 +1,5 @@
 import module namespace util  = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
+import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
 xdmp:set-response-content-type("text/html"),
 element html{
@@ -17,7 +18,7 @@ element html{
                 attribute class {"newspaper-a"},
                 element tr{element th{"Parameter"},element th{"Value"}},
                 element tr{element td{"&nbsp;"},element td{"&nbsp;"}},
-                let $field := "run-label"
+                let $field := $constants:RUN-LABEL-FIELD-NAME
                 return
                 element tr
                 {
@@ -49,7 +50,7 @@ element html{
                         }
                     }
                 },
-                for $field in fn:tokenize("inserts-per-second,duration,payload",",")
+                for $field in $constants:batch-data-fields
                 return
                 element tr
                 {

@@ -1,7 +1,6 @@
 import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
-
 xdmp:set-response-content-type("text/html"),
 
 element html{
@@ -17,17 +16,16 @@ element html{
             element table{
                attribute class{"newspaper-a"},
                element tr{
-                    let $field := "run-label"        
+                    let $field := $constants:RUN-LABEL-FIELD-NAME        
                     return
                     element th {util:element-name-to-title($field)}
-                    ,
-                    let $dont-show := for $field in fn:tokenize($constants:dont-show-in-jobs-table,",") return util:de-pluralize($field)                    
+                    ,                    
                     for $field in util:run-time-data-fields()
-                    where fn:not($field = $dont-show)
+                    where fn:not($field = $constants:environment-fields)
                     return
                     element th {util:element-name-to-title($field)} 
                     ,
-                    for $field in fn:tokenize("inserts-per-second,duration,payload",",")        
+                    for $field in $constants:batch-data-fields        
                     return
                     element th {util:element-name-to-title($field)},
                     element th{},
@@ -38,22 +36,34 @@ element html{
                 order by xs:int($job/job-id) ascending
                 return
                 element tr{
-                    let $field := "run-label"        
+                    if(util:is-job-running($job)) then
+                    attribute class{"green"}
+                    else
+                    ()
+                    ,
+                    let $field := $constants:RUN-LABEL-FIELD-NAME        
                     return
                     element td {$job/*[fn:node-name() = xs:QName($field)]}
                     ,
-                    let $dont-show := for $field in fn:tokenize($constants:dont-show-in-jobs-table,",") return util:de-pluralize($field)
                     for $field in util:run-time-data-fields()
-                    where fn:not($field = $dont-show)
+                    where fn:not($field = $constants:environment-fields)
                     return
                     element td {$job/*[fn:node-name() = xs:QName($field)]}
                     ,
-                    for $field in fn:tokenize("inserts-per-second,duration,payload",",")        
+                    for $field in $constants:batch-data-fields        
                     return
                     element td {$job/*[fn:node-name() = xs:QName($field)]}
                     ,
-                    element td{element a{attribute href{"/app/ui/job/delete-job.xqy?job-id="||$job/job-id},"Delete Job"}},
-                    element td{element a{attribute href{"/app/ui/job/run-job.xqy?job-id="||$job/job-id},"Run Job"}}
+                    if(util:is-job-running($job)) then
+                    (
+                        element td{"Job Running"},
+                        element td{"&nbsp;"}
+                    )
+                    else
+                    (                    
+                        element td{element a{attribute href{"/app/ui/job/delete-job.xqy?job-id="||$job/job-id},"Delete Job"}},
+                        element td{element a{attribute href{"/app/ui/job/run-job.xqy?job-id="||$job/job-id},"Run Job"}}
+                    )
                 }
             }
         }

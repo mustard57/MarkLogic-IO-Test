@@ -3,7 +3,7 @@ import module namespace constants = "http://marklogic.com/io-test/constants" at 
 import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
 
 
-declare variable $run-label := xdmp:get-request-field("run-label",util:get-run-label(util:get-batch-data-map()));
+declare variable $run-label := xdmp:get-request-field($constants:RUN-LABEL-FIELD-NAME,util:get-run-label(util:get-batch-data-map()));
 declare variable $stats := /io-stats[run-label = $run-label];
 
 declare function local:write-mb($uri){
@@ -26,14 +26,16 @@ declare function local:header-row($stats as node()*){
 
 declare function local:performance-table-from-stats($stats as node()*){
     let $singleton-values := util:get-singleton-values($stats)
-    let $width := xs:int(100 div (1 + fn:count(map:keys($singleton-values))))
+    let $width := xs:int(100 div (1 + fn:count(map:keys($singleton-values)) - fn:count($constants:environment-fields)))
     return
     element div{
         element div{
             attribute style{"float : left; width:"||xs:string($width)||"%"},
             element p{"Fixed Values : "}
         },
-        for $key in map:keys($singleton-values)        
+                
+        for $key in map:keys($singleton-values)
+        where fn:not($key = $constants:environment-fields)        
         order by $key
         return
         element div{
@@ -76,7 +78,24 @@ element html{
 		element h1{"IO Test Report"},
 		
 		element h4{"Run label is "||$run-label},
-		(: Show statistics ranked by elapsed time :)		
+		(: Show statistics ranked by elapsed time :)
+        element h3{"Environment"},
+		
+        let $singleton-values := util:get-singleton-values($stats)
+        let $width := xs:int(100 div fn:count($constants:environment-fields))
+
+        return
+        element div{
+            for $key in $constants:environment-fields
+            order by $key
+            return
+            element div{
+                attribute style{"float : left; width:"||xs:string($width)||"%"},
+                element p{util:element-name-to-title($key)||" : "||map:get($singleton-values,$key)}
+            }
+        },
+                
+				
 		element h3{"Full Run Statistics"},
 		local:performance-table-from-stats($stats),
 		
@@ -99,7 +118,7 @@ element html{
 				element h3{"Varying "||$qname||" with other values optimized"},
 				(: Get the stats documents corresponding to the other qnames being set to the optimum values :)
 				let $query := cts:and-query((
-								cts:element-value-query(xs:QName("run-label"),$run-label),
+								cts:element-value-query(xs:QName($constants:RUN-LABEL-FIELD-NAME),$run-label),
 								for $q in $qnames
 								return
 								if($q != $qname) then
@@ -131,7 +150,7 @@ element html{
 			if(fn:count(map:get($counts-map,$qname)) > 1) then
 			(
 				let $query := cts:and-query((
-								cts:element-value-query(xs:QName("run-label"),$run-label),
+								cts:element-value-query(xs:QName($constants:RUN-LABEL-FIELD-NAME),$run-label),
 								for $q in $qnames
 								return
 								if($q != $qname) then
