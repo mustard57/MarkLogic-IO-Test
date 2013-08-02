@@ -1,11 +1,27 @@
 import module namespace util  = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
+declare variable $ampersand := "&amp;";
+
 xdmp:set-response-content-type("text/html"),
 element html{
     element head{
         element title{"Create Job"},    
-        element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}}    
+        element link{attribute rel{"stylesheet"}, attribute type{"text/css"}, attribute href{"/public/css/io.css"}},
+        element script{attribute src{"/public/js/jquery-1.9.0.js"}," "},
+        element script{attribute src{"/public/js/app.js"}," "},                
+        element script{
+            attribute type{"text/javascript"},
+        
+            '            
+            $(document).ready(
+                function(){
+                    $("input").change(validate);
+                }
+            );            
+            '
+         }
+            
     },
     element body{
         element h1{"Create Job"},
@@ -16,8 +32,8 @@ element html{
             element table{
                 attribute style {"margin:  0 auto ; "},
                 attribute class {"newspaper-a"},
-                element tr{element th{"Parameter"},element th{"Value"}},
-                element tr{element td{"&nbsp;"},element td{"&nbsp;"}},
+                element tr{element th{"Parameter"},element th{"Value"},element th{}},
+                element tr{element td{"&nbsp;"},element td{"&nbsp;"},element td{"&nbsp;"}},
                 let $field := $constants:RUN-LABEL-FIELD-NAME
                 return
                 element tr
@@ -27,12 +43,17 @@ element html{
                     element td
                     {
                         element input{
-                            attribute name{$field},
+                            attribute id{$field},
+                            attribute name{$field},                            
                             attribute type{"text"},
                             attribute value{"Your label here"}
 
-                        }
+                        }                        
+                    },
+                    element td{
+                        attribute id{$field||"_comment"}
                     }
+                    
                 },
             
                 for $field in util:run-time-data-fields()
@@ -44,11 +65,15 @@ element html{
                     element td
                     {
                         element input{
-                            attribute name{$field},
+                            attribute id{$field},
+                            attribute name{$field},                            
                             attribute type{"text"},
                             attribute value{util:getDefaultValue($field)}
                         }
-                    }
+                    },
+                    element td{
+                        attribute id{$field||"_comment"}
+                    }                    
                 },
                 for $field in $constants:batch-data-fields
                 return
@@ -59,18 +84,22 @@ element html{
                     element td
                     {
                         element input{
-                            attribute name{$field},
+                            attribute id{$field},
+                            attribute name{$field},                            
                             attribute type{"text"},
                             attribute value{util:get-constant($field)}
                         }
-                    }
+                    },
+                    element td{
+                        attribute id{$field||"_comment"}
+                    }                    
                 },
                 
                 element tr
                 {
                     element td
                     {
-                        attribute colspan{"2"},
+                        attribute colspan{"3"},
                         element div{
                             attribute style {"width 100% ; margin : auto 0 ; text-align : center"},
                             element input{

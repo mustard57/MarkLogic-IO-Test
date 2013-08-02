@@ -51,7 +51,7 @@ element html{
 
             element h4{
                 util:element-name-to-title($field)||" : "||
-                map:get($run-data-map,util:de-pluralize($field))
+                map:get($batch-data-map,util:de-pluralize($field))
             }
         }
         ,

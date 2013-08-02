@@ -193,7 +193,7 @@ declare function util:round($val as xs:double,$places as xs:int){
     xs:int($val * math:pow(10,$places)) div math:pow(10,$places)    
 };
 
-declare function util:getDefaultValuesDoc(){
+declare function util:getDefaultValuesMap(){
     if(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)) then () 
     else xdmp:invoke("/app/procs/save-default-values.xqy",
         (xs:QName("db-name"),xdmp:database-name(xdmp:database())),
@@ -202,11 +202,11 @@ declare function util:getDefaultValuesDoc(){
             <prevent-deadlocks>false</prevent-deadlocks>
         </options>        
     ),
-    fn:doc($constants:DEFAULT-VALUES-DOCUMENT)
+    map:map(fn:doc($constants:DEFAULT-VALUES-DOCUMENT)/*)
 };    
 
 declare function util:getDefaultValue($field-name){
-    util:getDefaultValuesDoc()/default-values/*[fn:node-name() = xs:QName($field-name)]/text()    
+    map:get(util:getDefaultValuesMap(),$field-name)    
 };
 
 declare function util:getDefaultBatchDataFieldsAsMap(){
@@ -251,16 +251,56 @@ declare function util:delete-job($job-id){
     for $doc in /job[job-id = xs:string($job-id)] return xdmp:document-delete(fn:base-uri($doc))
 };
 
-declare function util:is-job-running($job as element(job)){
+declare function util:is-job-running($job as map:map){
     let $batch-data-map := util:get-batch-data-map()
     return
-    ($job/job-id = map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME))
+    (map:get($job,"job-id") = map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME))
     and
     fn:not(queue-empty())
 };
 
 declare function util:sort-types($map){
-    for $field in ($constants:FOREST-COUNT-FIELD-NAME,$constants:BATCH-SIZE-FIELD-NAME,$constants:IO-LIMIT-FIELD-NAME,
-        $constants:TREE-SIZE-FIELD-NAME,$constants:MERGE-RATIO-FIELD-NAME,$constants:THREAD-COUNT-FIELD-NAME)
-    return map:put($map,$field,xs:int(map:get($map,$field)))
+    for $field in $constants:integer-fields
+    return map:put($map,$field,xs:int(map:get($map,$field))),
+    for $field in $constants:boolean-fields
+    return map:put($map,$field,xs:boolean(fn:lower-case(map:get($map,$field))))
+    
+};
+
+declare function util:check-values($job-map as map:map){
+    let $error-map := map:map()
+    let $null := 
+    for $field in $constants:boolean-fields
+    return
+    if(
+        fn:false() = ( 
+            for $value in fn:tokenize(map:get($job-map,$field),",")
+            return
+            fn:matches(fn:lower-case($value),"^true|false$")
+        )
+    ) then
+        map:put($error-map,$field,util:element-name-to-title($field)||" : values should be 'true' or 'false'")
+    else()    
+    let $null := 
+    for $field in $constants:integer-fields
+    return
+    if(
+        fn:false() = ( 
+            for $value in fn:tokenize(map:get($job-map,$field),",")
+            return
+            fn:matches($value,"^\d+$")
+        )
+    ) then
+        map:put($error-map,$field,util:element-name-to-title($field)|| ": values should be integers")
+    else()    
+    let $null := 
+    for $field in $constants:singleton-fields
+    return
+    if(fn:count(fn:tokenize(map:get($job-map,$field),",")) > 1) then
+    map:put($error-map,$field,util:element-name-to-title($field)||" should be a singleton value")
+    else
+    ()
+    return
+    $error-map
+    
 };

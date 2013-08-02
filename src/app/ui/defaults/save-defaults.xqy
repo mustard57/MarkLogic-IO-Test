@@ -1,22 +1,23 @@
 import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
-let $job-id  := xdmp:eval("fn:max((xs:int(/job/job-id) + 1,1))")
 let $map := map:map()
 let $null := 
 (
-    map:put($map,"job-id",$job-id), 
-    for $field in util:run-time-data-fields()
-    return
-    map:put($map,$field,xdmp:get-request-field($field,util:getDefaultValue($field))),    
-    for $field in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)        
+    for $field in xdmp:get-request-field-names()
     return
     map:put($map,$field,xdmp:get-request-field($field,util:getDefaultValue($field)))
 )
-let $uri := "/job/"||xdmp:md5(xdmp:quote($map))||".xml"
 let $checks := util:check-values($map)
 let $ok as xs:boolean := fn:not(map:keys($checks))
-let $null := if($ok) then xdmp:document-insert($uri,document{$map}) else()
+let $map := map:map()
+let $null := 
+(
+    for $field in xdmp:get-request-field-names()
+    return
+    map:put($map,fn:replace($field,"-default",""),xdmp:get-request-field($field,util:getDefaultValue($field)))
+)
+let $null := if($ok) then xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,document{$map}) else()
 return
 (
 xdmp:set-response-content-type("text/html"),
@@ -31,7 +32,7 @@ element html{
             'var timer;
 
              timer_func = function() {
-                location.replace("'||(if($ok) then "/app/ui/job/list-jobs.xqy" else "/app/ui/job/create-job.xqy")||'");
+                location.replace("'||(if($ok) then "/app/ui/defaults/show-defaults.xqy" else "/app/ui/job/create-defaults.xqy")||'");
              };
 
              timer = setTimeout(timer_func,3000);'
@@ -40,10 +41,10 @@ element html{
     },
     element body{
         if($ok) then
-            element h1{"Job Saved"}
+            element h1{"Defaults Saved"}
         else
         (
-            element h1{"Job Not Saved"},
+            element h1{"Defaults Not Saved"},
             element br{},
             element h2{"You have the following errors"},
             element br{},
@@ -58,7 +59,7 @@ element html{
             attribute style{"clear:both ;"},
             element div{
                 attribute style{"float:left;width : 50% ;"},            
-                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}}            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/defaults/show-defaults.xqy"},"Show Defaults"}}            
             },
             element div{
                 attribute style{"float:left;width : 50%"},            

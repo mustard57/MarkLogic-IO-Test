@@ -8,28 +8,24 @@ declare variable $batch-data-map := map:map();
 (: If called with no arguments at all, assume job-id = 0 - a special case whihc will run the job with the lowest id :)
 declare variable $job-id := if(xdmp:get-request-field-names()) then xdmp:get-request-field($constants:JOB-ID-FIELD-NAME) else "0";
 
-declare function local:get-field-from-job($job-doc,$field-name){
-    xs:string($job-doc/job/*[fn:node-name() = xs:QName($field-name)])
-};
-
 (: So if we have a job-id, run a job :)
 if(fn:not(fn:empty($job-id))) then
 (
     let $job-id := if($job-id != "0") then xs:int($job-id) else fn:min(xs:int(/job/job-id))
-    let $job-doc := fn:doc(fn:base-uri((/job[job-id = $job-id])[1]))
+    let $job as map:map := map:map((for $job in xdmp:directory("/job/") where map:get(map:map($job/*),"job-id") = $job-id return $job)/*)
     let $null := map:put($batch-data-map,$constants:JOB-ID-FIELD-NAME,$job-id) 
     return
     (
         for $field in util:run-time-data-fields()
         return
-            map:put($run-data-map,$field,local:get-field-from-job($job-doc,$field))    
+            map:put($run-data-map,$field,map:get($job,$field))    
         ,
         for $field in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)
         return
         if($field != $constants:RUN-LABEL-FIELD-NAME) then
-            map:put($batch-data-map,$field,xs:int(local:get-field-from-job($job-doc,$field)))
+            map:put($batch-data-map,$field,xs:int(map:get($job,$field)))
         else
-            map:put($batch-data-map,$field,local:get-field-from-job($job-doc,$field))
+            map:put($batch-data-map,$field,map:get($job,$field))
     )
 )
 else
@@ -75,7 +71,7 @@ element html{
             xdmp:log("Run Label is "||map:get($batch-data-map,$constants:RUN-LABEL-FIELD-NAME),"info"),            
             if(util:queue-empty() or util:isScheduledTask()) then
             (
-                element h1{"Job Running"},
+                element h1{"Job Running"},                    
                 xdmp:spawn("/app/procs/run.xqy",(xs:QName("input-map"),$run-data-map,xs:QName("batch-data-map"),$batch-data-map)),   
                 element h4{"Your job has been spawned"},
                 element br{},
@@ -102,6 +98,7 @@ element html{
                         element td{map:get($batch-data-map,$key)}
                     }
                 }
+                
             )
             else
             (

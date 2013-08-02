@@ -32,37 +32,38 @@ element html{
                     element th{}
                 },
     
-                for $job in /job
-                order by xs:int($job/job-id) ascending
+                for $doc in xdmp:directory("/job/")
+                let $map as map:map := map:map($doc/*)  
+                order by map:get($map,"job-id") ascending
                 return
                 element tr{
-                    if(util:is-job-running($job)) then
+                    if(util:is-job-running($map)) then
                     attribute class{"green"}
                     else
                     ()
                     ,
                     let $field := $constants:RUN-LABEL-FIELD-NAME        
                     return
-                    element td {$job/*[fn:node-name() = xs:QName($field)]}
+                    element td{map:get($map,$field)}
                     ,
                     for $field in util:run-time-data-fields()
                     where fn:not($field = $constants:environment-fields)
                     return
-                    element td {$job/*[fn:node-name() = xs:QName($field)]}
+                    element td{map:get($map,$field)}
                     ,
                     for $field in $constants:batch-data-fields        
                     return
-                    element td {$job/*[fn:node-name() = xs:QName($field)]}
+                    element td{map:get($map,$field)}
                     ,
-                    if(util:is-job-running($job)) then
+                    if(util:is-job-running($map)) then
                     (
                         element td{"Job Running"},
                         element td{"&nbsp;"}
                     )
                     else
                     (                    
-                        element td{element a{attribute href{"/app/ui/job/delete-job.xqy?job-id="||$job/job-id},"Delete Job"}},
-                        element td{element a{attribute href{"/app/ui/job/run-job.xqy?job-id="||$job/job-id},"Run Job"}}
+                        element td{element a{attribute href{"/app/ui/job/delete-job.xqy?job-id="||map:get($map,"job-id")},"Delete Job"}},
+                        element td{element a{attribute href{"/app/ui/job/run-job.xqy?job-id="||map:get($map,"job-id")},"Run Job"}}
                     )
                 }
             }

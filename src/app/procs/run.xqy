@@ -50,7 +50,7 @@ declare function local:process($batch-map as map:map,$run-data-map as map:map){
     (: Set up the database :)
     xdmp:invoke("/app/procs/database-setup.xqy",(xs:QName("db-name"),$db-name,xs:QName("forest-count"),map:get($run-data-map,$constants:FOREST-COUNT-FIELD-NAME))),
     (: Save default values if we don't already have a default values document :)
-    util:getDefaultValuesDoc()[0],(: Make sure default values doc exists :) 
+    util:getDefaultValuesMap()[0],(: Make sure default values doc exists :) 
     (: Set up the admin level config :) 
     let $config :=     
     (
