@@ -5,7 +5,7 @@ let $job-id  := xdmp:eval("fn:max((xs:int(/job/job-id) + 1,1))")
 let $map := map:map()
 let $null := 
 (
-    map:put($map,"job-id",$job-id), 
+    map:put($map,$constants:JOB-ID-FIELD-NAME,$job-id), 
     for $field in util:run-time-data-fields()
     return
     map:put($map,$field,xdmp:get-request-field($field,util:getDefaultValue($field))),    

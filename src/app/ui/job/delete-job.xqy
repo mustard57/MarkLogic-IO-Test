@@ -1,7 +1,7 @@
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
 declare variable $job-id := xdmp:get-request-field($constants:JOB-ID-FIELD-NAME,"NONE");
-declare variable $jobs := for $job in xdmp:directory("/job/") where xs:string(map:get(map:map($job/*),"job-id")) = $job-id return $job;
+declare variable $jobs := for $job in xdmp:directory("/job/") where xs:string(map:get(map:map($job/*),$constants:JOB-ID-FIELD-NAME)) = $job-id return $job;
 
 xdmp:set-response-content-type("text/html"),
 element html{

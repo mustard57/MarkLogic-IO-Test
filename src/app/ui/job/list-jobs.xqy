@@ -34,7 +34,7 @@ element html{
     
                 for $doc in xdmp:directory("/job/")
                 let $map as map:map := map:map($doc/*)  
-                order by map:get($map,"job-id") ascending
+                order by map:get($map,$constants:JOB-ID-FIELD-NAME) ascending
                 return
                 element tr{
                     if(util:is-job-running($map)) then
@@ -62,8 +62,8 @@ element html{
                     )
                     else
                     (                    
-                        element td{element a{attribute href{"/app/ui/job/delete-job.xqy?job-id="||map:get($map,"job-id")},"Delete Job"}},
-                        element td{element a{attribute href{"/app/ui/job/run-job.xqy?job-id="||map:get($map,"job-id")},"Run Job"}}
+                        element td{element a{attribute href{"/app/ui/job/delete-job.xqy?job-id="||map:get($map,$constants:JOB-ID-FIELD-NAME)},"Delete Job"}},
+                        element td{element a{attribute href{"/app/ui/job/run-job.xqy?job-id="||map:get($map,$constants:JOB-ID-FIELD-NAME)},"Run Job"}}
                     )
                 }
             }

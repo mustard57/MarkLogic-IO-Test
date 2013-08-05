@@ -23,7 +23,8 @@ declare function local:process-run-data-map($batch-map as map:map,$param-lists-m
   else
   let $singleton-run-data-map := map:map()
   let $null := for $key in map:keys($run-data-map) return map:put($singleton-run-data-map,fn:replace($key,"s$",""),map:get($run-data-map,$key))
-  let $null := util:sort-types($singleton-run-data-map)  
+  let $null := util:sort-types($singleton-run-data-map)
+  let $null := util:sort-types($batch-map)  
   return
   local:process($batch-map,$singleton-run-data-map)
 };

@@ -248,26 +248,35 @@ declare function util:restart-required($run-data-map) as xs:boolean{
 
 declare function util:delete-job($job-id){
     let $null := xdmp:log("Job id is "||xs:string($job-id),"debug")
-    for $doc in /job[job-id = xs:string($job-id)] return xdmp:document-delete(fn:base-uri($doc))
+    for $job in xdmp:directory("/job/") 
+    where map:get(map:map($job/*),$constants:JOB-ID-FIELD-NAME) = $job-id 
+    return xdmp:document-delete(fn:base-uri($job))
+
 };
 
 declare function util:is-job-running($job as map:map){
     let $batch-data-map := util:get-batch-data-map()
     return
-    (map:get($job,"job-id") = map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME))
+    (map:get($job,$constants:JOB-ID-FIELD-NAME) = map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME))
     and
     fn:not(queue-empty())
 };
 
 declare function util:sort-types($map){
     for $field in $constants:integer-fields
+    where map:get($map,$field)
     return map:put($map,$field,xs:int(map:get($map,$field))),
     for $field in $constants:boolean-fields
+    where map:get($map,$field)    
     return map:put($map,$field,xs:boolean(fn:lower-case(map:get($map,$field))))
     
 };
 
 declare function util:check-values($job-map as map:map){
+    util:check-values($job-map,fn:true())
+};
+    
+declare function util:check-values($job-map as map:map,$check-thread-count as xs:boolean){
     let $error-map := map:map()
     let $null := 
     for $field in $constants:boolean-fields
@@ -295,6 +304,7 @@ declare function util:check-values($job-map as map:map){
     else()    
     let $null := 
     for $field in $constants:singleton-fields
+    where (($field != $constants:THREAD-COUNT-FIELD-NAME) or $check-thread-count)
     return
     if(fn:count(fn:tokenize(map:get($job-map,$field),",")) > 1) then
     map:put($error-map,$field,util:element-name-to-title($field)||" should be a singleton value")
@@ -339,12 +349,22 @@ declare function util:create-job-maps($values-map as map:map,$defaults-map as ma
     return
     if(fn:count(map:get($values-map,$values-key)) > 1) then
     (
+        if($values-key != $constants:THREAD-COUNT-FIELD-NAME) then
+            let $map := map:map()
+            let $null := for $key in map:keys($defaults-map) return map:put($map,$key,map:get($defaults-map,$key))        
+            let $values :=  map:put($map,$values-key,fn:string-join(map:get($values-map,$values-key)(: [. != map:get($defaults-map,$values-key)] :),","))
+            let $null := map:put($map,$constants:PERMUTED-PREFIX,$values-key)
+            return
+            $map
+        else
+        for $value in map:get($values-map,$values-key)
         let $map := map:map()
-        let $null := for $key in map:keys($defaults-map) return map:put($map,$key,map:get($defaults-map,$key))        
-        let $values :=  map:put($map,$values-key,fn:string-join(map:get($values-map,$values-key)[. != map:get($defaults-map,$values-key)],","))
-        let $null := map:put($map,$constants:PERMUTED-PREFIX,$values-key)
+        let $null := for $key in map:keys($defaults-map) return map:put($map,$key,map:get($defaults-map,$key))
+        let $null := map:put($map,$values-key,$value)
+        let $null := map:put($map,$constants:PERMUTED-PREFIX,$values-key)        
+        (: where $value != map:get($defaults-map,$values-key) :)
         return
-        $map
+        $map        
     )
     else(),
     $defaults-map            

@@ -24,7 +24,7 @@ return
 map:put($defaults-map,$field-name,xs:string(util:getDefaultValue($field-name)))
 ,
 
-let $checks := util:check-values(util:harmonize-maps($values-map,$defaults-map))
+let $checks := util:check-values(util:harmonize-maps($values-map,$defaults-map),fn:false())
 let $ok as xs:boolean := fn:not(map:keys($checks))
 let $current-job-id  := xdmp:eval("fn:max((xs:int(/job/job-id),1))")
 let $job-maps := util:create-job-maps(util:harmonize-maps($values-map,$defaults-map),$defaults-map)

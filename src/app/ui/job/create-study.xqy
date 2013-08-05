@@ -14,7 +14,7 @@ element html{
             '            
             $(document).ready(
                 function(){
-                    $("input").change(validate);
+                    $("input").change(validate_study);
                 }
             );            
             '
@@ -42,7 +42,7 @@ element html{
                     {util:element-name-to-title($field)},
                     element td
                     {   
-                        if($field = $constants:singleton-fields) then
+                        if($field = $constants:singleton-fields and $field != $constants:THREAD-COUNT-FIELD-NAME) then
                             attribute colspan{"2"}
                         else()
                         ,
@@ -53,7 +53,7 @@ element html{
                             attribute value{util:getDefaultValue($field)}
                         }
                     },                    
-                    if(fn:not($field = $constants:singleton-fields)) then
+                    if(fn:not($field = $constants:singleton-fields) or $field = $constants:THREAD-COUNT-FIELD-NAME) then
                         element td
                         {
                             element input{
@@ -66,14 +66,14 @@ element html{
                     else()
                     ,
                     element td{
-                        if($field = $constants:singleton-fields) then
+                        if($field = $constants:singleton-fields and $field != $constants:THREAD-COUNT-FIELD-NAME) then
                             attribute colspan{"2"}
                         else()
                         ,                    
                         attribute id{$field||"-default_comment"}
                     },                    
 
-                    if(fn:not($field = $constants:singleton-fields)) then                    
+                    if(fn:not($field = $constants:singleton-fields) or $field = $constants:THREAD-COUNT-FIELD-NAME) then                    
                         element td{
                             attribute id{$field||"-values_comment"}
                         }

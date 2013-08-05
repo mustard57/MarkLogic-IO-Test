@@ -11,8 +11,8 @@ declare variable $job-id := if(xdmp:get-request-field-names()) then xdmp:get-req
 (: So if we have a job-id, run a job :)
 if(fn:not(fn:empty($job-id))) then
 (
-    let $job-id := if($job-id != "0") then xs:int($job-id) else fn:min(xs:int(/job/job-id))
-    let $job as map:map := map:map((for $job in xdmp:directory("/job/") where map:get(map:map($job/*),"job-id") = $job-id return $job)/*)
+    let $job-id := if($job-id != "0") then xs:int($job-id) else fn:min(for $job in xdmp:directory("/job/") return map:get(map:map($job/*),$constants:JOB-ID-FIELD-NAME))
+    let $job as map:map := map:map((for $job in xdmp:directory("/job/") where map:get(map:map($job/*),$constants:JOB-ID-FIELD-NAME) = $job-id return $job)/*)
     let $null := map:put($batch-data-map,$constants:JOB-ID-FIELD-NAME,$job-id) 
     return
     (
@@ -42,10 +42,6 @@ else
         map:put($batch-data-map,$field,xdmp:get-request-field($field,util:get-constant($field)))
 )
 ,
-for $field-name in $constants:read-only-fields
-return
-map:put($run-data-map,$field-name,xs:string(util:getDefaultValue($field-name)))
-,
 xdmp:log("Run Job called","info"),
 xdmp:set-response-content-type("text/html"),
 element html{
@@ -72,6 +68,10 @@ element html{
             xdmp:log("Request Count is "||xs:string(util:request-count()),"info"),
             xdmp:log("Job ID is "||xs:string($job-id),"info"),
             xdmp:log("Run Label is "||map:get($batch-data-map,$constants:RUN-LABEL-FIELD-NAME),"info"),            
+            for $field-name in $constants:read-only-fields
+            return
+            map:put($run-data-map,$field-name,xs:string(util:getDefaultValue($field-name)))
+            ,
             if(util:queue-empty() or util:isScheduledTask()) then
             (
                 element h1{"Job Running"},                    
