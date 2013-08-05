@@ -286,7 +286,7 @@ declare function util:check-values($job-map as map:map){
     return
     if(
         fn:false() = ( 
-            for $value in fn:tokenize(map:get($job-map,$field),",")
+            for $value in fn:tokenize(fn:string-join(map:get($job-map,$field),","),",")
             return
             fn:matches($value,"^\d+$")
         )
@@ -303,4 +303,58 @@ declare function util:check-values($job-map as map:map){
     return
     $error-map
     
+};
+
+(:
+    For all keys, for the values, tokenize them and combine them
+    So if map:get($map1,key1) = a,b and map:get($map2,key1)  = b,c, return a map with map:get($map,$key) = a,b,c
+:)
+declare function util:harmonize-maps($map1 as map:map,$map2 as map:map) as map:map
+{
+    let $map := map:map()
+    let $null := 
+    for $key in map:keys($map1)
+    return
+    map:put($map,$key,fn:tokenize(map:get($map1,$key),","))
+    let $null := 
+    for $key in map:keys($map2)
+    return
+    for $value in fn:tokenize(map:get($map2,$key),",")
+    return
+    if($value = map:get($map,$key)) then ()
+    else
+    map:put($map,$key,(map:get($map,$key),$value))
+    let $null := 
+    for $key in map:keys($map)
+    return
+    map:put($map,$key,for $value in map:get($map,$key) order by $value return $value)
+    return
+    $map
+};
+
+declare function util:create-job-maps($values-map as map:map,$defaults-map as map:map) as map:map*
+{
+    map:put($defaults-map,$constants:PERMUTED-PREFIX,"default"),
+    for $values-key in map:keys($values-map)
+    return
+    if(fn:count(map:get($values-map,$values-key)) > 1) then
+    (
+        let $map := map:map()
+        let $null := for $key in map:keys($defaults-map) return map:put($map,$key,map:get($defaults-map,$key))        
+        let $values :=  map:put($map,$values-key,fn:string-join(map:get($values-map,$values-key)[. != map:get($defaults-map,$values-key)],","))
+        let $null := map:put($map,$constants:PERMUTED-PREFIX,$values-key)
+        return
+        $map
+    )
+    else(),
+    $defaults-map            
+};
+
+declare function append-slash-to-directory($directory-name) as xs:string{
+    if(fn:contains($directory-name,"/")) then
+        if(fn:ends-with($directory-name,"/")) then $directory-name else $directory-name||"/"
+    else if(fn:contains($directory-name,"\")) then
+        if(fn:ends-with($directory-name,"\")) then $directory-name else $directory-name||"\"    
+    else
+    $directory-name
 };

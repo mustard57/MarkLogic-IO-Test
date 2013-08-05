@@ -34,29 +34,8 @@ element html{
                 attribute class {"newspaper-a"},
                 element tr{element th{"Parameter"},element th{"Value"},element th{}},
                 element tr{element td{"&nbsp;"},element td{"&nbsp;"},element td{"&nbsp;"}},
-                let $field := $constants:RUN-LABEL-FIELD-NAME
-                return
-                element tr
-                {
-                    element td
-                    {util:element-name-to-title($field)},
-                    element td
-                    {
-                        element input{
-                            attribute id{$field},
-                            attribute name{$field},                            
-                            attribute type{"text"},
-                            attribute value{"Your label here"}
-
-                        }                        
-                    },
-                    element td{
-                        attribute id{$field||"_comment"}
-                    }
-                    
-                },
-            
-                for $field in util:run-time-data-fields()
+                for $field in ($constants:RUN-LABEL-FIELD-NAME,util:run-time-data-fields(), $constants:batch-data-fields)
+                where $field != $constants:read-only-fields
                 return
                 element tr
                 {
@@ -69,32 +48,14 @@ element html{
                             attribute name{$field},                            
                             attribute type{"text"},
                             attribute value{util:getDefaultValue($field)}
-                        }
+
+                        }                        
                     },
                     element td{
                         attribute id{$field||"_comment"}
-                    }                    
-                },
-                for $field in $constants:batch-data-fields
-                return
-                element tr
-                {
-                    element td
-                    {util:element-name-to-title($field)},
-                    element td
-                    {
-                        element input{
-                            attribute id{$field},
-                            attribute name{$field},                            
-                            attribute type{"text"},
-                            attribute value{util:get-constant($field)}
-                        }
-                    },
-                    element td{
-                        attribute id{$field||"_comment"}
-                    }                    
-                },
-                
+                    }
+                    
+                },                            
                 element tr
                 {
                     element td
@@ -118,19 +79,15 @@ element html{
         element div{
             attribute style{"clear:both ;"},
             element div{
-                attribute style{"float:left;width : 25% ;"},            
+                attribute style{"float:left;width : 33% ;"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}}            
             },
             element div{
-                attribute style{"float:left;width : 25%"},            
-                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/run-config.xqy"},"Run Configuration"}}
-            },
-            element div{
-                attribute style{"float:left;width : 25%"},            
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
             },
             element div{
-                attribute style{"float:left;width : 25%"},            
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/index.xqy"},"Home"}}            
             }                        
         }

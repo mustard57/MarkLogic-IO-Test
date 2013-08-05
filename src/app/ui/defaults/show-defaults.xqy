@@ -29,9 +29,15 @@ element html{
         element div{
             attribute style{"clear:both"},
             element div{
-                attribute style{"float:left;width : 100%"},            
-                element p{element a {attribute href{"/app/index.xqy"},"Home"}}
+                attribute style{"float:left;width : 50% ;"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/index.xqy"},"Home"}}                        
+            },
+            element div{
+                attribute style{"float:left;width : 50% ;"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/ui/defaults/create-defaults.xqy"},"Modify Defaults"}}                        
             }
+            
+            
         }
          
     }

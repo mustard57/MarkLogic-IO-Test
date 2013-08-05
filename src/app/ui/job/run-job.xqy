@@ -42,7 +42,10 @@ else
         map:put($batch-data-map,$field,xdmp:get-request-field($field,util:get-constant($field)))
 )
 ,
-
+for $field-name in $constants:read-only-fields
+return
+map:put($run-data-map,$field-name,xs:string(util:getDefaultValue($field-name)))
+,
 xdmp:log("Run Job called","info"),
 xdmp:set-response-content-type("text/html"),
 element html{
@@ -118,19 +121,15 @@ element html{
         element div{
             attribute style{"clear:both ;"},
             element div{
-                attribute style{"float:left;width : 25% ;"},            
+                attribute style{"float:left;width : 33% ;"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}}            
             },
             element div{
-                attribute style{"float:left;width : 25%"},            
-                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/run-config.xqy"},"Run Configuration"}}
-            },
-            element div{
-                attribute style{"float:left;width : 25%"},            
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
             },
             element div{
-                attribute style{"float:left;width : 25%"},            
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/index.xqy"},"Home"}}            
             }                        
         }

@@ -4,8 +4,10 @@ declare variable $run-time-data-fields := ($FOREST-COUNT-FIELD-NAME,$BATCH-SIZE-
     $FAST-INSERT-VALUE-FIELD-NAME,$THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
 declare variable $batch-data-fields := ($INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME);
 declare variable $environment-fields := ($HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
+declare variable $read-only-fields := ($HOST-COUNT-FIELD-NAME);
 
-declare variable $singleton-fields := ($THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
+declare variable $singleton-fields := ($THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,
+    $DISK-TYPE-FIELD-NAME,$INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME,$RUN-LABEL-FIELD-NAME);
 declare variable $integer-fields := ($FOREST-COUNT-FIELD-NAME,$BATCH-SIZE-FIELD-NAME,$IO-LIMIT-FIELD-NAME,$MERGE-RATIO-FIELD-NAME,$TREE-SIZE-FIELD-NAME,
     $THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME);
 declare variable $boolean-fields := ($FAST-INSERT-VALUE-FIELD-NAME);     
@@ -45,6 +47,7 @@ declare variable $DURATION-FIELD-NAME := "duration";
 declare variable $PAYLOAD-FIELD-NAME := "payload"; 
 declare variable $RUN-LABEL-FIELD-NAME := "run-label";
 
+
 (: Page related field names and values :)
 declare variable $MODE-FIELD-NAME := "mode";
 declare variable $JOB-ID-FIELD-NAME := "job-id";
@@ -52,6 +55,9 @@ declare variable $CREATE-MODE := "create";
 declare variable $DELETE-MODE := "delete";
 declare variable $NAME-FIELD-NAME := "name";
 declare variable $VALUE-FIELD-NAME := "value";
+declare variable $PERMUTED-PREFIX := "permuted";
+declare variable $DIRECTORY-FIELD-NAME := "directory";
+declare variable $FILENAME-FIELD-NAME := "filename";
 
 (: Defaults :)
 declare variable $DEFAULT-BACKGROUND-IO-LIMIT := 0;
@@ -78,3 +84,8 @@ declare variable $RECORDS-DB-EVAL-OPTIONS :=
 <options xmlns="xdmp:eval">
     <database>{xdmp:database($RECORDS-DB-NAME)}</database>
   </options>;
+declare variable $CONTENT-DB-EVAL-OPTIONS := 
+<options xmlns="xdmp:eval">
+    <database>{xdmp:database($DATA-DB-NAME)}</database>
+  </options>;
+  

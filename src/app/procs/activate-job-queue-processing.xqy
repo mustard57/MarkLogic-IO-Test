@@ -43,7 +43,7 @@ element html{
             (
                 admin:save-configuration(
                     admin:group-add-scheduled-task(admin:get-configuration(), xdmp:group(), $task)),
-                element h4{"Job added"}        
+                element h4{"Scheduling activated"}        
             )
             else if($mode = $constants:DELETE-MODE) then
             (
@@ -53,7 +53,7 @@ element html{
                 admin:save-configuration(
                     admin:group-delete-scheduled-task(admin:get-configuration(), xdmp:group(), $task))
                 ,
-                element h4{"Job removed"}        
+                element h4{"Scheduling deactivated"}        
             )
             else
             element h4{"Mode "||$mode||" not recognized"}

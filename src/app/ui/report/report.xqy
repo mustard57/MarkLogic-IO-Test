@@ -192,23 +192,19 @@ element html{
         element div{
             attribute style{"clear:both"},
             element div{
-                attribute style{"float:left;width : 20%"},            
+                attribute style{"float:left;width : 25%"},            
                 element p{element a{attribute href{"/app/ui/report/remove-report.xqy?"||$constants:RUN-LABEL-FIELD-NAME||"="||$run-label},"Delete Records"}}
             },
             element div{
-                attribute style{"float:left;width : 20%"},            
+                attribute style{"float:left;width : 25%"},            
                 element p{element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}}            
             },
             element div{
-                attribute style{"float:left;width : 20%"},            
-                element p{element a{attribute href{"/app/ui/run-config.xqy"},"Run Configuration"}}
-            },
-            element div{
-                attribute style{"float:left;width : 20%"},            
+                attribute style{"float:left;width : 25%"},            
                 element p{element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
             },
             element div{
-                attribute style{"float:left;width : 20%"},            
+                attribute style{"float:left;width : 25%"},            
                 element p{element a{attribute href{"/app/index.xqy"},"Home"}}            
             }                        
         }

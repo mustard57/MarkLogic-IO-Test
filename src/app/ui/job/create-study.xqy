@@ -25,31 +25,27 @@ element html{
         element h1{"Create Study"},
         element form{
             attribute method {"POST"},            
-            (: attribute action {"/app/ui/job/save-job.xqy"}, :)
+            attribute action {"/app/ui/job/save-study.xqy"}, 
             element br{},
             element table{
                 attribute style {"margin:  0 auto ; "},
                 attribute class {"newspaper-a"},
-                element tr{element th{"Parameter"},element th{"Values"},element th{"Default Values"},element th{},element th{}},
+                element tr{element th{"Parameter"},element th{"Default Values"},element th{"Values"},element th{},element th{}},
                 element tr{element td{"&nbsp;"},element td{"&nbsp;"},element td{"&nbsp;"},element td{"&nbsp;"},element td{"&nbsp;"}},
             
                 for $field in ($constants:RUN-LABEL-FIELD-NAME,util:run-time-data-fields(), $constants:batch-data-fields)
+                where $field != $constants:read-only-fields
                 return
                 element tr
                 {
                     element td
                     {util:element-name-to-title($field)},
                     element td
-                    {
-                        element input{
-                            attribute id{$field||"-values"},
-                            attribute name{$field||"-values"},                            
-                            attribute type{"text"},
-                            attribute value{util:getDefaultValue($field)}
-                        }
-                    },
-                    element td
-                    {
+                    {   
+                        if($field = $constants:singleton-fields) then
+                            attribute colspan{"2"}
+                        else()
+                        ,
                         element input{
                             attribute id{$field||"-default"},
                             attribute name{$field||"-default"},                            
@@ -57,12 +53,31 @@ element html{
                             attribute value{util:getDefaultValue($field)}
                         }
                     },                    
+                    if(fn:not($field = $constants:singleton-fields)) then
+                        element td
+                        {
+                            element input{
+                                attribute id{$field||"-values"},
+                                attribute name{$field||"-values"},                            
+                                attribute type{"text"},
+                                attribute value{util:getDefaultValue($field)}
+                            }
+                        }
+                    else()
+                    ,
                     element td{
-                        attribute id{$field||"-values_comment"}
-                    },                    
-                    element td{
+                        if($field = $constants:singleton-fields) then
+                            attribute colspan{"2"}
+                        else()
+                        ,                    
                         attribute id{$field||"-default_comment"}
-                    }                    
+                    },                    
+
+                    if(fn:not($field = $constants:singleton-fields)) then                    
+                        element td{
+                            attribute id{$field||"-values_comment"}
+                        }
+                    else()                    
                     
                 },
                 
@@ -70,7 +85,7 @@ element html{
                 {
                     element td
                     {
-                        attribute colspan{"3"},
+                        attribute colspan{"5"},
                         element div{
                             attribute style {"width 100% ; margin : auto 0 ; text-align : center"},
                             element input{
@@ -89,19 +104,15 @@ element html{
         element div{
             attribute style{"clear:both ;"},
             element div{
-                attribute style{"float:left;width : 25% ;"},            
+                attribute style{"float:left;width : 33% ;"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}}            
             },
             element div{
-                attribute style{"float:left;width : 25%"},            
-                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/run-config.xqy"},"Run Configuration"}}
-            },
-            element div{
-                attribute style{"float:left;width : 25%"},            
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
             },
             element div{
-                attribute style{"float:left;width : 25%"},            
+                attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/index.xqy"},"Home"}}            
             }                        
         }

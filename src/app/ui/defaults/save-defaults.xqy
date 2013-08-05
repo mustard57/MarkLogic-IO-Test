@@ -17,6 +17,10 @@ let $null :=
     return
     map:put($map,fn:replace($field,"-default",""),xdmp:get-request-field($field,util:getDefaultValue($field)))
 )
+let $null := 
+for $field-name in $constants:read-only-fields
+return
+map:put($map,$field-name,xs:string(util:getDefaultValue($field-name)))
 let $null := if($ok) then xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,document{$map}) else()
 return
 (

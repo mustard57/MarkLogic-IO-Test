@@ -18,14 +18,18 @@ element html{
             element h4{element a{attribute href{"/app/ui/report/list-reports.xqy"},"Report List"}},
             element h4{element a{attribute href{"/app/ui/report/report.xqy"},"Current Report"}},
             element h2{"Jobs"},
-            element h4{element a{attribute href{"/app/ui/job/create-job.xqy"},"Create Job"}},                   
+            element h4{element a{attribute href{"/app/ui/job/create-job.xqy"},"Create Job"}},  
+            element h4{element a{attribute href{"/app/ui/job/create-study.xqy"},"Create Study"}},                               
             element h4{element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}},                 
             element h2{"Status and Configuration"},            
             element h4{element a{attribute href{"/app/ui/status.xqy"},"Status"}},            
             
             element h4{element a{attribute href{"/app/ui/defaults/show-defaults.xqy"},"Show Defaults"}},
- 
-            if(util:isTaskScheduled()) then 
+            element h4{element a{attribute href{"/app/ui/defaults/create-defaults.xqy"},"Create Defaults"}},
+            element h2{"Export Data"},
+            element h4{element a{attribute href{"/app/ui/export/export-statistics.xqy"},"Export Statistics"}},            
+            element h4{element a{attribute href{"/app/ui/export/export-content.xqy"},"Export Content"}},            
+            if(util:isTaskScheduled()) then             
             element h4{
                 element a{
                     attribute href{"/app/procs/activate-job-queue-processing.xqy?"||$constants:MODE-FIELD-NAME||"="||$constants:DELETE-MODE},

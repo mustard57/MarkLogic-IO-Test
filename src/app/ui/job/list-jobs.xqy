@@ -72,27 +72,23 @@ element html{
         element div{
             attribute style{"clear:both"},
             element div{
-                attribute style{"float:left;width : 16%"},            
-                element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/run-config.xqy"},"Run Configuration"}}
-            },
-            element div{
-                attribute style{"float:left;width : 16%"},            
+                attribute style{"float:left;width : 20%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
             },
             element div{
-                attribute style{"float:left;width : 16%"},            
+                attribute style{"float:left;width : 20%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/ui/job/create-job.xqy"},"Create Job"}}
             },
             element div{
-                attribute style{"float:left;width : 16%"},            
-                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/delete-job.xqy"},"Delete Job"}}
-            },           
+                attribute style{"float:left;width : 20%"},            
+                element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/ui/job/remove-all-jobs.xqy"},"Delete All Jobs"}}
+            },                       
             element div{
-                attribute style{"float:left;width : 16%"},            
+                attribute style{"float:left;width : 20%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/ui/report/list-reports.xqy"},"Report List"}}
             },                       
             element div{
-                attribute style{"float:left;width : 16%"},            
+                attribute style{"float:left;width : 20%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a {attribute href{"/app/index.xqy"},"Home"}}
             }
             
