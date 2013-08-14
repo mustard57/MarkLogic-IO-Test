@@ -33,7 +33,7 @@ element html{
                 element tr{element th{"Parameter"},element th{"Default Values"},element th{}},
                 element tr{element td{"&nbsp;"},element td{"&nbsp;"},element td{"&nbsp;"}},
             
-                for $field in ($constants:RUN-LABEL-FIELD-NAME,util:run-time-data-fields(), $constants:batch-data-fields)
+                for $field in ($constants:RUN-LABEL-FIELD-NAME,util:run-time-data-fields(), $constants:batch-data-fields,$constants:other-fields)
                 where $field != $constants:read-only-fields                
                 return
                 element tr

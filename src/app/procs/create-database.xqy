@@ -4,6 +4,8 @@ xquery version "1.0-ml";
 
 import module namespace admin = "http://marklogic.com/xdmp/admin" at "/MarkLogic/admin.xqy";
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
+import module namespace util  = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
+
 
 declare variable $db-name as xs:string external;
 declare variable $forest-count as xs:int external;
@@ -11,7 +13,10 @@ declare variable $forest-count as xs:int external;
 declare variable $hosts := for $host in xdmp:hosts() order by xdmp:host-name($host) return $host;
 
 declare function local:getForestDirectory($forest-index as xs:int){
-  $constants:DATA-DB-FOREST-DIRECTORY
+  let $dir := util:getDefaultValue($constants:FOREST-DIRECTORY-FIELD-NAME)
+  return
+  (: Deal with the special empty case :)
+  if($dir = "") then () else $dir
 };
 
 (: If database does not exist, create it :)

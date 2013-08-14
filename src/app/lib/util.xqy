@@ -171,7 +171,7 @@ declare function util:toBytes($size as xs:long) as xs:string{
     else if($size < 1000 * 1000 * 1000) then
         util:round($size div 1000 div 1000,3)||" mb"
     else
-        util:round($size div 1000 div 1000,3)||" gb"    
+        util:round($size div 1000 div 1000 div 1000,3)||" gb"    
 };
 
 declare function util:toShorthand($size as xs:long) as xs:string{
@@ -215,6 +215,7 @@ declare function util:getDefaultBatchDataFieldsAsMap(){
     for $key in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)
     return
     map:put($map,$key,util:get-constant($key))
+    let $null := util:sort-types($map)
     return
     $map
 };
@@ -283,7 +284,7 @@ declare function util:check-values($job-map as map:map,$check-thread-count as xs
     return
     if(
         fn:false() = ( 
-            for $value in fn:tokenize(map:get($job-map,$field),",")
+            for $value in map:get($job-map,$field)
             return
             fn:matches(fn:lower-case($value),"^true|false$")
         )

@@ -34,9 +34,10 @@ element html{
                   admin:appserver-get-root(admin:get-configuration(),xdmp:server()),
                   5,
                   xdmp:database(),
-                  0,
-                  admin:appserver-get-modules-database(admin:get-configuration(),xdmp:server()), 
-                  0)
+                  admin:appserver-get-modules-database(admin:get-configuration(),xdmp:server()),
+                  xdmp:user("admin"),
+                  xdmp:host()
+                  )
             
             return
             if($mode = $constants:CREATE-MODE) then

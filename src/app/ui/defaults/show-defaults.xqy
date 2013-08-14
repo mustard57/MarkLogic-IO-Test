@@ -16,7 +16,7 @@ element html{
             let $defaults := util:getDefaultValuesMap()
             return
             if(map:keys($defaults)) then
-                for $key in ($constants:RUN-LABEL-FIELD-NAME,util:run-time-data-fields(), $constants:batch-data-fields)
+                for $key in ($constants:RUN-LABEL-FIELD-NAME,util:run-time-data-fields(), $constants:batch-data-fields,$constants:other-fields)
                 return
                 element h4{
                     util:element-name-to-title($key)||" : "||

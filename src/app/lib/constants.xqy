@@ -5,6 +5,7 @@ declare variable $run-time-data-fields := ($FOREST-COUNT-FIELD-NAME,$BATCH-SIZE-
 declare variable $batch-data-fields := ($INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME);
 declare variable $environment-fields := ($HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
 declare variable $read-only-fields := ($HOST-COUNT-FIELD-NAME);
+declare variable $other-fields := ($FOREST-DIRECTORY-FIELD-NAME);
 
 declare variable $singleton-fields := ($THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,
     $DISK-TYPE-FIELD-NAME,$INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME,$RUN-LABEL-FIELD-NAME);
@@ -18,9 +19,6 @@ declare variable $HOST-TYPE := "HP EliteBook 8460w";
 declare variable $HOST-COUNT := fn:count(xdmp:hosts());
 declare variable $FILE-SYSTEM-FORMAT := "NTFS";
 declare variable $DISK-TYPE := "SATA2-7200RPM"; 
-
-(: Pretty much the only thing you're likely to need to change :)
-declare variable $DATA-DB-FOREST-DIRECTORY := ();
 
 (: The source for generating text documents :)
 declare variable $SOURCE-DOCUMENT := "/on-liberty.txt";
@@ -58,6 +56,7 @@ declare variable $VALUE-FIELD-NAME := "value";
 declare variable $PERMUTED-PREFIX := "permuted";
 declare variable $DIRECTORY-FIELD-NAME := "directory";
 declare variable $FILENAME-FIELD-NAME := "filename";
+declare variable $FOREST-DIRECTORY-FIELD-NAME := "forest-directory";
 
 (: Defaults :)
 declare variable $DEFAULT-BACKGROUND-IO-LIMIT := 0;
@@ -69,6 +68,7 @@ declare variable $run-label := "unnamed-test";
 declare variable $inserts-per-second  := 10;
 declare variable $duration := 10;
 declare variable $payload  :=  10000;
+declare variable $DEFAULT-FOREST-DIRECTORY := "";
 
 (: Names of databases, key files, directories :)
 declare variable $RECORDS-DB-NAME := "io-test-content";

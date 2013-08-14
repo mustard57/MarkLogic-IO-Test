@@ -80,7 +80,7 @@ declare function local:get-random-text-with-length($doc-length as xs:integer){
 
 for $count in (1 to $batch-size)
 let $text := local:get-random-text-with-length($document-length)
-let $uri := $constants:SAMPLE-CONTENT-URI-PREFIX||xdmp:md5(xs:string(fn:current-dateTime())||xs:string(xdmp:random(1000000)))||$document-suffix
+let $uri := $constants:SAMPLE-CONTENT-URI-PREFIX||xdmp:md5(xs:string(fn:current-dateTime())||xs:string(xdmp:random(1000000))||xs:string(xdmp:random(1000000)))||$document-suffix
 
 return
 (

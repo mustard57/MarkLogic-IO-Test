@@ -2,6 +2,7 @@ xquery version "1.0-ml";
 
 import module namespace admin = "http://marklogic.com/xdmp/admin" at "/MarkLogic/admin.xqy";
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
+import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
 
 declare variable $db-name as xs:string external;
 
@@ -23,9 +24,11 @@ let $null :=
     map:put($map,"inserts-per-second",$constants:inserts-per-second),
     map:put($map,"duration",$constants:duration),
     map:put($map,"payload",$constants:payload),
-    map:put($map,"run-label",$constants:run-label)     
+    map:put($map,"run-label",$constants:run-label),    
+    map:put($map,$constants:FOREST-DIRECTORY-FIELD-NAME,$DEFAULT-FOREST-DIRECTORY) 
      
 )
+let $null := util:sort-types($map)
 return
 xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,document{$map})
 

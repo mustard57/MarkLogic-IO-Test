@@ -48,7 +48,9 @@ element html{
                 else
                 	element h4{"DB "||$db-name||" : in the process of being created"}
                 ,
-                element h4{"Expected db size : "||util:toShorthand(util:expected-document-count($batch-data-map))||" fragments"}
+                element h4{"Expected db size : "||util:toShorthand(util:expected-document-count($batch-data-map))||" fragments"},
+                element h4{"Expected db volume : "||util:toBytes(util:expected-document-volume($batch-data-map))}
+                
                 ,
                 element h2{"Environment"},                                                                    
                 for $field in util:run-time-data-fields()
@@ -56,6 +58,9 @@ element html{
                 return
                 element h4{
                     util:element-name-to-title($field)||" : "||map:get($batch-data-map,$field)
+                },
+                element h4{
+                    util:element-name-to-title($constants:FOREST-DIRECTORY-FIELD-NAME)||" : "||util:getDefaultValue($constants:FOREST-DIRECTORY-FIELD-NAME)
                 }
                 
             },
