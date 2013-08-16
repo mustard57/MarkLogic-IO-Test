@@ -35,7 +35,7 @@ element html{
         element h4{"Run Label : "||util:get-run-label($batch-data-map)},        
         element div{
             element div{
-            attribute style{"height : 60%; float:left;width : 33%"},            
+            attribute style{"height : 70%; float:left;width : 33%"},            
 
                 element h2{"Queue and Fragment Statistics"},
                 element h4{"Queue Size : "||xs:string(util:queue-size())},

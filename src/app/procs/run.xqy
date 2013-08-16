@@ -46,10 +46,11 @@ declare function local:get-run-data-as-map(){
 
 (: Carry out the test process for a given configuration :)
 declare function local:process($batch-map as map:map,$run-data-map as map:map){
-    (: Add the run config as a document - this is used by status.xqy :)
-    xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:RUN-CONFIG-DOCUMENT,xs:QName("node"),document{$run-data-map})),
     (: Set up the database :)
     xdmp:invoke("/app/procs/database-setup.xqy",(xs:QName("db-name"),$db-name,xs:QName("forest-count"),map:get($run-data-map,$constants:FOREST-COUNT-FIELD-NAME))),
+    (: Add the run config as a document - this is used by status.xqy :)
+    (: Note database-setup waits for queue to clear :)
+    xdmp:invoke("/app/procs/document-insert.xqy",(xs:QName("uri"),$constants:RUN-CONFIG-DOCUMENT,xs:QName("node"),document{$run-data-map})),    
     (: Save default values if we don't already have a default values document :)
     util:getDefaultValuesMap()[0],(: Make sure default values doc exists :) 
     (: Set up the admin level config :) 
@@ -70,7 +71,12 @@ declare function local:process($batch-map as map:map,$run-data-map as map:map){
     return
     (
         (: Start the simulation :)
-        xdmp:invoke("/app/procs/write-simulation.xqy",(xs:QName("db-name"),$db-name,xs:QName("batch-map"),$batch-map,xs:QName("run-data-map"),$run-data-map)), 
+        if(map:get($run-data-map,$constants:RUN-MODE-FIELD-NAME) = $constants:LOAD-FROM-DISK-MODE) then 
+            xdmp:invoke("/app/procs/load-from-disk.xqy",(xs:QName("db-name"),$db-name,xs:QName("batch-map"),$batch-map,xs:QName("run-data-map"),$run-data-map))
+        else if(map:get($run-data-map,$constants:RUN-MODE-FIELD-NAME) = $constants:GENERATE-AND-SAVE-MODE) then
+            xdmp:invoke("/app/procs/write-simulation.xqy",(xs:QName("db-name"),$db-name,xs:QName("batch-map"),$batch-map,xs:QName("run-data-map"),$run-data-map))
+        else()        
+        , 
         (: Put this in place to make sure writes complete :)
         xdmp:sleep(5000),
         (: Record Statistics :)
@@ -91,15 +97,17 @@ if(util:restart-required($input-map)) then
     admin:save-configuration-without-restart(
         admin:taskserver-set-threads(
             admin:get-configuration(),xdmp:group(),xs:int(map:get($input-map,$constants:THREAD-COUNT-FIELD-NAME)))),
-    xdmp:restart(xdmp:hosts(),"IO Testing Run Configuration required restart") 
+    xdmp:restart(xdmp:hosts(),"IO Testing Run Configuration required restart"),
+    (: Add a sleep as restart is not synchronous - code will keep running then get interrupted :)
+    xdmp:sleep(10000) 
 )
 else 
+(: Note we don't see the job disappear until the whole process finishes due to the way transactions work :)
 util:delete-job(map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME)),
 
 let $map1 := if(map:keys($input-map)) then $input-map else local:get-run-data-as-map()
 let $map2 := if(map:keys($batch-data-map)) then $batch-data-map else util:getDefaultBatchDataFieldsAsMap()
 let $null := util:set-batch-data-map($map1 + $map2)
-let $null := if(util:restart-required($input-map)) then () else util:delete-job(map:get($batch-data-map,$constants:JOB-ID-FIELD-NAME))
 return
 local:process-run-data-map($map2,$map1,map:map())
 

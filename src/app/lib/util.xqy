@@ -148,19 +148,21 @@ declare function util:get-payload($batch-map as map:map) as xs:int{
     map:get($batch-map,$constants:PAYLOAD-FIELD-NAME)
 };
 
-declare function util:get-duration($batch-map as map:map) as xs:int{
-    map:get($batch-map,$constants:DURATION-FIELD-NAME)
+declare function util:get-duration($batch-map as map:map) as xs:double{
+    xs:int(100 * map:get($batch-map,$constants:DURATION-FIELD-NAME)) div 100
 };
 
 declare function util:inserts-per-second($batch-map as map:map) as xs:int{
     map:get($batch-map,$constants:INSERTS-PER-SECOND-FIELD-NAME)
 };
 declare function util:expected-document-count($batch-map as map:map) as xs:long{
-    util:get-duration($batch-map) * util:inserts-per-second($batch-map)     
+    if(map:get($batch-map,$constants:EXPECTED-FRAGMENT-COUNT-FIELD-NAME)) then map:get($batch-map,$constants:EXPECTED-FRAGMENT-COUNT-FIELD-NAME)
+    else 
+    xs:long(util:get-duration($batch-map) * util:inserts-per-second($batch-map))     
 };
 
 declare function util:expected-document-volume($batch-map as map:map) as xs:long{
-    util:inserts-per-second($batch-map) * util:get-duration($batch-map) * util:get-payload($batch-map)    
+    xs:long(util:inserts-per-second($batch-map) * util:get-duration($batch-map) * util:get-payload($batch-map))    
 };
 
 declare function util:toBytes($size as xs:long) as xs:string{
@@ -378,4 +380,8 @@ declare function append-slash-to-directory($directory-name) as xs:string{
         if(fn:ends-with($directory-name,"\")) then $directory-name else $directory-name||"\"    
     else
     $directory-name
+};
+
+declare function get-job-ids() as xs:int*{
+    for $job in xdmp:directory("/job/") return map:get(map:map($job/*),$constants:JOB-ID-FIELD-NAME)
 };

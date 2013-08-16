@@ -1,24 +1,23 @@
 module namespace constants = "http://marklogic.com/io-test/constants";
 
 declare variable $run-time-data-fields := ($FOREST-COUNT-FIELD-NAME,$BATCH-SIZE-FIELD-NAME,$IO-LIMIT-FIELD-NAME,$MERGE-RATIO-FIELD-NAME,$TREE-SIZE-FIELD-NAME,
-    $FAST-INSERT-VALUE-FIELD-NAME,$THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
+    $FAST-INSERT-VALUE-FIELD-NAME,$THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME,$RUN-MODE-FIELD-NAME,$DATA-DIRECTORY-FIELD-NAME);
 declare variable $batch-data-fields := ($INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME);
 declare variable $environment-fields := ($HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,$DISK-TYPE-FIELD-NAME);
 declare variable $read-only-fields := ($HOST-COUNT-FIELD-NAME);
 declare variable $other-fields := ($FOREST-DIRECTORY-FIELD-NAME);
 
 declare variable $singleton-fields := ($THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$HOST-TYPE-FIELD-NAME,$FILE-SYSTEM-FORMAT-FIELD-NAME,
-    $DISK-TYPE-FIELD-NAME,$INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME,$RUN-LABEL-FIELD-NAME);
+    $DISK-TYPE-FIELD-NAME,$INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME,$RUN-LABEL-FIELD-NAME,$RUN-MODE-FIELD-NAME,$DATA-DIRECTORY-FIELD-NAME);
 declare variable $integer-fields := ($FOREST-COUNT-FIELD-NAME,$BATCH-SIZE-FIELD-NAME,$IO-LIMIT-FIELD-NAME,$MERGE-RATIO-FIELD-NAME,$TREE-SIZE-FIELD-NAME,
     $THREAD-COUNT-FIELD-NAME,$HOST-COUNT-FIELD-NAME,$INSERTS-PER-SECOND-FIELD-NAME,$DURATION-FIELD-NAME,$PAYLOAD-FIELD-NAME);
 declare variable $boolean-fields := ($FAST-INSERT-VALUE-FIELD-NAME);     
 
-
 (: Environment Values :)
-declare variable $HOST-TYPE := "HP EliteBook 8460w";
+declare variable $HOST-TYPE := "Add your host type e.g. EliteBook 8460w";
 declare variable $HOST-COUNT := fn:count(xdmp:hosts());
-declare variable $FILE-SYSTEM-FORMAT := "NTFS";
-declare variable $DISK-TYPE := "SATA2-7200RPM"; 
+declare variable $FILE-SYSTEM-FORMAT := "Add your file system e.g. NTFS";
+declare variable $DISK-TYPE := "Add your disk type e.g SATA2-7200RPM"; 
 
 (: The source for generating text documents :)
 declare variable $SOURCE-DOCUMENT := "/on-liberty.txt";
@@ -44,7 +43,10 @@ declare variable $INSERTS-PER-SECOND-FIELD-NAME := "inserts-per-second";
 declare variable $DURATION-FIELD-NAME := "duration";
 declare variable $PAYLOAD-FIELD-NAME := "payload"; 
 declare variable $RUN-LABEL-FIELD-NAME := "run-label";
-
+declare variable $RUN-MODE-FIELD-NAME := "run-mode";
+declare variable $FOREST-DIRECTORY-FIELD-NAME := "forest-directory";
+declare variable $DATA-DIRECTORY-FIELD-NAME := "data-directory";
+declare variable $EXPECTED-FRAGMENT-COUNT-FIELD-NAME := "expected-fragment-count";
 
 (: Page related field names and values :)
 declare variable $MODE-FIELD-NAME := "mode";
@@ -56,7 +58,6 @@ declare variable $VALUE-FIELD-NAME := "value";
 declare variable $PERMUTED-PREFIX := "permuted";
 declare variable $DIRECTORY-FIELD-NAME := "directory";
 declare variable $FILENAME-FIELD-NAME := "filename";
-declare variable $FOREST-DIRECTORY-FIELD-NAME := "forest-directory";
 
 (: Defaults :)
 declare variable $DEFAULT-BACKGROUND-IO-LIMIT := 0;
@@ -64,6 +65,7 @@ declare variable $DEFAULT-FOREST-COUNT := fn:count(xdmp:hosts());
 declare variable $DEFAULT-BATCH-SIZE := 1;
 declare variable $DEFAULT-FAST-INSERT-VALUE := "TRUE";
 declare variable $DEFAULT-THREAD-COUNT := 16;
+declare variable $DEFAULT-RUN-MODE := $GENERATE-AND-SAVE-MODE;
 declare variable $run-label := "unnamed-test";
 declare variable $inserts-per-second  := 10;
 declare variable $duration := 10;
@@ -80,6 +82,8 @@ declare variable $BATCH-CONFIG-DOCUMENT := "/io-test/batch-config.xml";
 
 (: Miscellaneous :)
 declare variable $RUN-JOB-TASK := "/app/ui/job/run-job.xqy";
+declare variable $GENERATE-AND-SAVE-MODE := "generate-and-save";
+declare variable $LOAD-FROM-DISK-MODE := "load-from-disk";
 declare variable $RECORDS-DB-EVAL-OPTIONS := 
 <options xmlns="xdmp:eval">
     <database>{xdmp:database($RECORDS-DB-NAME)}</database>

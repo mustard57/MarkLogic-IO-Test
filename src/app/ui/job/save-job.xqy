@@ -1,7 +1,7 @@
 import module namespace util = "http://marklogic.com/io-test/util" at "/app/lib/util.xqy";
 import module namespace constants = "http://marklogic.com/io-test/constants" at "/app/lib/constants.xqy";
 
-let $job-id  := xdmp:eval("fn:max((xs:int(/job/job-id) + 1,1))")
+let $job-id  := 1 + fn:max((util:get-job-ids(),0))
 let $map := map:map()
 let $null := 
 (

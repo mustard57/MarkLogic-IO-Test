@@ -11,7 +11,7 @@ declare variable $job-id := if(xdmp:get-request-field-names()) then xdmp:get-req
 (: So if we have a job-id, run a job :)
 if(fn:not(fn:empty($job-id))) then
 (
-    let $job-id := if($job-id != "0") then xs:int($job-id) else fn:min(for $job in xdmp:directory("/job/") return map:get(map:map($job/*),$constants:JOB-ID-FIELD-NAME))
+    let $job-id := if($job-id != "0") then xs:int($job-id) else fn:min(util:get-job-ids())
     let $job as map:map := map:map((for $job in xdmp:directory("/job/") where map:get(map:map($job/*),$constants:JOB-ID-FIELD-NAME) = $job-id return $job)/*)
     let $null := map:put($batch-data-map,$constants:JOB-ID-FIELD-NAME,$job-id) 
     return
@@ -88,7 +88,7 @@ element html{
                     return
                     element tr{
                         element td{
-                            $key
+                            util:element-name-to-title($key)
                         },
                         element td{map:get($run-data-map,$key)}
                     },
