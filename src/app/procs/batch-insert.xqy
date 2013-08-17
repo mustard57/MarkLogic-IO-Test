@@ -5,7 +5,7 @@ declare variable $fast-insert-value as xs:boolean external;
 
 declare variable $forests := xdmp:database-forests(xdmp:database());
 
-for $path in $paths
+for $path in fn:tokenize($paths,",")
 let $uri := "/"||fn:tokenize($path,"/|\\")[fn:last()]
 
 return

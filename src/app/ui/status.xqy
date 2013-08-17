@@ -35,7 +35,7 @@ element html{
         element h4{"Run Label : "||util:get-run-label($batch-data-map)},        
         element div{
             element div{
-            attribute style{"height : 70%; float:left;width : 33%"},            
+            attribute style{"float:left;width : 33%"},            
 
                 element h2{"Queue and Fragment Statistics"},
                 element h4{"Queue Size : "||xs:string(util:queue-size())},
@@ -91,7 +91,7 @@ element html{
         }
         ,
         element div{
-            attribute style{"clear:both ; margin-top : 10%"},
+            attribute style{"position:absolute; bottom:60; width: 80%; clear:both"},
             element div{
                 attribute style{"float:left;width : 33%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/job/list-jobs.xqy"},"Job List"}}            

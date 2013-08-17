@@ -12,7 +12,7 @@ element html{
         element h1{"Job List"},
         element br{},
         element div{
-            attribute style {"height : 60%"},
+            attribute style {"height : 60%"}, 
             element table{
                attribute class{"newspaper-a"},
                element tr{
@@ -70,7 +70,7 @@ element html{
         }
         ,
         element div{
-            attribute style{"clear:both"},
+            attribute style{"position:absolute; bottom:60; width: 80%; clear:both"},
             element div{
                 attribute style{"float:left;width : 20%"},            
                 element p{attribute style{"text-align : center ; width : 100%"}, element a{attribute href{"/app/ui/status.xqy"},"Status"}}            
