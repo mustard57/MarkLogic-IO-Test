@@ -26,7 +26,9 @@ declare function local:header-row($stats as node()*){
 
 declare function local:performance-table-from-stats($stats as node()*){
     let $singleton-values := util:get-singleton-values($stats)
-    let $width := xs:int(100 div (1 + fn:count(map:keys($singleton-values)) - fn:count($constants:environment-fields)))
+	let $keys := for $key in map:keys($singleton-values) where fn:not($key = $constants:environment-fields) return $key
+    let $width := xs:int(100 div (1 + fn:count($keys)))
+	
     return
     element div{
         element div{
@@ -34,8 +36,7 @@ declare function local:performance-table-from-stats($stats as node()*){
             element p{"Fixed Values : "}
         },
                 
-        for $key in map:keys($singleton-values)
-        where fn:not($key = $constants:environment-fields)        
+        for $key in $keys
         order by $key
         return
         element div{
