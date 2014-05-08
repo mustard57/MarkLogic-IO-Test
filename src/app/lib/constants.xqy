@@ -70,7 +70,8 @@ declare variable $run-label := "unnamed-test";
 declare variable $inserts-per-second  := 10;
 declare variable $duration := 10;
 declare variable $payload  :=  10000;
-declare variable $DEFAULT-FOREST-DIRECTORY := "";
+declare variable $DEFAULT-FOREST-DIRECTORY := "/var/opt/MarkLogic";
+declare variable $DEFAULT-DATA-DIRECTORY := "/tmp";
 
 (: Names of databases, key files, directories :)
 declare variable $RECORDS-DB-NAME := "io-test-content";

@@ -26,6 +26,7 @@ let $null :=
     map:put($map,$constants:PAYLOAD-FIELD-NAME,$constants:payload),
     map:put($map,$constants:RUN-LABEL-FIELD-NAME,$constants:run-label),    
     map:put($map,$constants:FOREST-DIRECTORY-FIELD-NAME,$constants:DEFAULT-FOREST-DIRECTORY),
+	map:put($map,$constants:DATA-DIRECTORY-FIELD-NAME,$constants:DEFAULT-DATA-DIRECTORY),
     map:put($map,$constants:RUN-MODE-FIELD-NAME,$constants:DEFAULT-RUN-MODE)    
      
 )
