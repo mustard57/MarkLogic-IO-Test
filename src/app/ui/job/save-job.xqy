@@ -8,10 +8,10 @@ let $null :=
     map:put($map,$constants:JOB-ID-FIELD-NAME,$job-id), 
     for $field in util:run-time-data-fields()
     return
-    map:put($map,$field,xdmp:get-request-field($field,util:getDefaultValue($field))),    
+    map:put($map,$field,xdmp:get-request-field($field,xs:string(util:getDefaultValue($field)))),    
     for $field in ($constants:batch-data-fields,$constants:RUN-LABEL-FIELD-NAME)        
     return
-    map:put($map,$field,xdmp:get-request-field($field,util:getDefaultValue($field)))
+    map:put($map,$field,xdmp:get-request-field($field,xs:string(util:getDefaultValue($field))))
 )
 let $null := 
 for $field-name in $constants:read-only-fields

@@ -12,8 +12,9 @@ element html{
     },
     element body{
             element h1{"MarkLogic IO Testing Home Page"},
-            (: element h2{"Execution"},            
-            element h4{element a{attribute href{"/app/run-form.xqy"},"Configure then run"}},     :)
+			if(fn:not(xdmp:get-current-roles() = xdmp:role("admin"))) then
+			element h1{"You do not have admin privileges, so the testing functions will not work. Expect Errors. Browsing Reports is OK"}
+			else(),
             element h2{"Jobs"},
             element h4{element a{attribute href{"/app/ui/job/create-job.xqy"},"Create Job"}},  
             element h4{element a{attribute href{"/app/ui/job/create-study.xqy"},"Create Study"}},                               
