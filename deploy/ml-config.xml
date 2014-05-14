@@ -255,6 +255,12 @@
       </collections>
       <privileges>
         <privilege>
+          <privilege-name>unprotected-uri</privilege-name>
+        </privilege>	  	  	  
+        <privilege>
+          <privilege-name>admin-module-read</privilege-name>
+        </privilege>	  	  
+        <privilege>
           <privilege-name>xdmp:value</privilege-name>
         </privilege>
         <privilege>
