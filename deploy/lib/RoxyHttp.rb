@@ -23,6 +23,7 @@
 require "net/https"
 require "uri"
 require 'digest/md5'
+require 'base64'
 require 'logger'
 
 module Net
@@ -69,6 +70,12 @@ module Net
       header << "response=\"#{Digest::MD5.hexdigest(request_digest)}\""
 
       @header['Authorization'] = header
+    end
+
+    def basic_auth(user, password)
+      encoded = Base64.encode64("#{user}:#{password}").chomp
+
+      @header['Authorization'] = ["Basic #{encoded}"]
     end
   end
 end
@@ -290,7 +297,6 @@ module Roxy
       @user_name = request_params[:user_name]
       @password = request_params[:password]
 
-      @logger.debug("Opening new #{@protocol.upcase} connection to #@server:#@port")
       @http              = Net::HTTP.new(@server, @port)
       @http.open_timeout = @params[:http_connection_open_timeout]
       @http.read_timeout = @params[:http_connection_read_timeout]
@@ -367,8 +373,30 @@ module Roxy
           setup_streaming(request)
 
           response = @http.request(request, &block)
+
           if (response.code.to_i == 401)
-            request.digest_auth(@user_name, @password, response)
+            if request_params[:auth_method] == "basic"
+              request.basic_auth(@user_name, @password)
+            else
+              request.digest_auth(@user_name, @password, response)
+            end
+            response = @http.request(request, &block)
+            if (response.code.to_i == 302)
+              @logger.debug("request redirected: #{response['location']}")
+              new_uri = URI(response['location'])
+              request_params[:protocol] = new_uri.scheme
+              request_params[:server] = new_uri.host
+              request_params[:port] = new_uri.port
+              start(request_params)
+              response = @http.request(request, &block)
+            end
+          elsif (response.code.to_i == 302)
+            @logger.debug("request redirected: #{response['location']}")
+            new_uri = URI(response['location'])
+            request_params[:protocol] = new_uri.scheme
+            request_params[:server] = new_uri.host
+            request_params[:port] = new_uri.port
+            start(request_params)
             response = @http.request(request, &block)
           end
 
@@ -402,6 +430,8 @@ module Roxy
             # We will be retrying the request, so reset the file pointer
             reset_fileptr_offset(request, mypos)
           end
+        rescue Net::HTTPBadResponse => e
+          # Ignoring 'wrong status line: "trueHTTP/1.1 204 Resource Services Updated"' because it's perfectly valid.
         rescue Exception => e # See comment at bottom for the list of errors seen...
           @http = nil
           # if ctrl+c is pressed - we have to reraise exception to terminate proggy
@@ -427,7 +457,7 @@ module Roxy
     def finish(reason = '')
       if @http && @http.started?
         reason = ", reason: '#{reason}'" unless self.class.blank?(reason)
-        @logger.info("Closing #{@http.use_ssl? ? 'HTTPS' : 'HTTP'} connection to #{@http.address}:#{@http.port}#{reason}")
+        @logger.debug("Closing #{@http.use_ssl? ? 'HTTPS' : 'HTTP'} connection to #{@http.address}:#{@http.port}#{reason}")
         @http.finish
       end
     end
