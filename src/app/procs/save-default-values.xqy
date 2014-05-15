@@ -32,6 +32,8 @@ let $null :=
 )
 let $null := util:sort-types($map)
 return
-xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,document{$map})
+xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,document{$map},
+(xdmp:permission($constants:IO-TEST-ROLE,"update"),xdmp:permission($constants:IO-TEST-ROLE,"read"),xdmp:permission($constants:IO-TEST-ROLE,"insert")))
+
 
 

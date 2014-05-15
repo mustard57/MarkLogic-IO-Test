@@ -82,6 +82,7 @@ declare variable $RUN-CONFIG-DOCUMENT := "/io-test/run-config.xml";
 declare variable $BATCH-CONFIG-DOCUMENT := "/io-test/batch-config.xml";
 
 (: Miscellaneous :)
+declare variable $IO-TEST-ROLE := "io-test-role";
 declare variable $RUN-JOB-TASK := "/app/ui/job/run-job.xqy";
 declare variable $GENERATE-AND-SAVE-MODE := "generate-and-save";
 declare variable $LOAD-FROM-DISK-MODE := "load-from-disk";

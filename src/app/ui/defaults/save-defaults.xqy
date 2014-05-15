@@ -21,7 +21,7 @@ let $null :=
 for $field-name in $constants:read-only-fields
 return
 map:put($map,$field-name,xs:string(util:getDefaultValue($field-name)))
-let $null := if($ok) then xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,document{$map}) else()
+let $null := if($ok) then xdmp:document-insert($constants:DEFAULT-VALUES-DOCUMENT,document{$map},(xdmp:permission($constants:IO-TEST-ROLE,"update"),xdmp:permission($constants:IO-TEST-ROLE,"read"),xdmp:permission($constants:IO-TEST-ROLE,"insert"))) else()
 return
 (
 xdmp:set-response-content-type("text/html"),
